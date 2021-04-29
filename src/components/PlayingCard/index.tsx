@@ -8,7 +8,9 @@ export interface PlayingCardProps {
   face?: string;
   back?: string;
   variant: "face" | "back";
+  onChange: (value: number, variant: "face" | "back") => void;
 }
+
 const useAriaLabel = (variant, value) => {
   if (variant === "back") {
     return "The card is face down";
@@ -29,6 +31,7 @@ export const PlayingCard: React.FC<PlayingCardProps> = ({
   back,
   label,
   variant,
+  onChange,
 }) => {
   const [state, setState] = useState(variant);
   const [rotate, setRotate] = useState(variant === "face" ? 180 : 0);
@@ -42,7 +45,7 @@ export const PlayingCard: React.FC<PlayingCardProps> = ({
     }
   };
   useEffect(() => {
-    console.log(state);
+    onChange?.(value, state);
   }, [state]);
   return (
     <div
