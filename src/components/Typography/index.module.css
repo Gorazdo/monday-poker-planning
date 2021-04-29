@@ -1,0 +1,18 @@
+.paragraph {
+  /** 
+    Borrowed from monday Storybook 
+    Reason: these styles are missing in monday-ui-react-core/dist/main.css
+  */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #323338;
+  color: var(--primary-text-color);
+}
+
+.gutterBottom {
+  margin-bottom: 0.35em;
+}

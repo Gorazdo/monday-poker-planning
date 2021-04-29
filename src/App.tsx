@@ -1,6 +1,4 @@
 import Button from "monday-ui-react-core/dist/Button";
-import EditableInput from "monday-ui-react-core/dist/EditableInput";
-import EditableHeading from "monday-ui-react-core/dist/EditableHeading";
 import { Avatar } from "./components/Avatar";
 import { Grid } from "./components/Grid";
 import { useBoardUsers } from "./hooks/useBoardUsers";
@@ -8,9 +6,10 @@ import { PlayingCard } from "./components/PlayingCard";
 import { useEffect } from "react";
 import { monday } from "./services/monday";
 import { pickCard } from "./hooks/useStorage";
+import { Intro } from "./components/Intro";
+
 function App() {
   const { value: users } = useBoardUsers();
-  console.log({ EditableInput, EditableHeading });
   useEffect(() => {
     monday.listen("events", (res) => {
       console.log("events", res);
@@ -32,7 +31,7 @@ function App() {
   };
   return (
     <div className="App">
-      <EditableInput value="Edit H2 tooltip" tooltip="Click to edit" />
+      <Intro />
       <code>{JSON.stringify(users)}</code>
       <Button>Start planning</Button>
       <Grid variant="row">
