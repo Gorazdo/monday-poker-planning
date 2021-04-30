@@ -1,17 +1,17 @@
 import classes from "./index.module.css";
 import Button from "monday-ui-react-core/dist/Button";
-import { useAsync, useAsyncFn } from "react-use";
+import { useAsyncFn } from "react-use";
 import { createBoard } from "../../services/createBoard";
 import MoveArrowRight from "monday-ui-react-core/dist/icons/MoveArrowRight";
-import { getRandomEmojie } from "../../services/getRandomEmojie";
-import { makeBoardUrl } from "../../services/makeBoardUrl";
+import { getRandomEmojie } from "../../utils/getRandomEmojie";
+import { makeBoardUrl } from "../../utils/makeBoardUrl";
 
 const generateBoardName = () => {
-  return getRandomEmojie() + " " + "Poker Planning Board";
+  return getRandomEmojie() + " Poker Planning Board";
 };
 
 export const ButtonSection = ({ severity }) => {
-  const [{ value, loading, error }, createNewBoard] = useAsyncFn(
+  const [{ value, loading }, createNewBoard] = useAsyncFn(
     async () => await createBoard(generateBoardName())
   );
 

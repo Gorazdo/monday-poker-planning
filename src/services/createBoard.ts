@@ -59,6 +59,6 @@ const prepareNewlyCreatedBoard = async (boardId: Board["id"]) => {
   columns.push(await createColumn("Session Duration", "time_tracking"));
 
   console.log("created columns", columns);
-  const demoGroup = await createGroup(boardId, "My first task to plan");
+  const demoGroup = await createGroup(boardId, "Planning Poker Session #1");
   console.log("the demo group", demoGroup);
 };

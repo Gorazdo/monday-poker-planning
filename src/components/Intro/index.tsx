@@ -13,7 +13,7 @@ import { useBoardId } from "../../contexts/AppContext";
 
 export const Intro = () => {
   const boardId = useBoardId();
-  const { value, loading, error } = useAsync(async () => {
+  const { value } = useAsync(async () => {
     return await fetchBoardSummary(boardId);
   }, [boardId]);
   return (

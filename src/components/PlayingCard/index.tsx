@@ -46,7 +46,7 @@ export const PlayingCard: React.FC<PlayingCardProps> = ({
   };
   useEffect(() => {
     onChange?.(value, state);
-  }, [state]);
+  }, [onChange, value, state]);
   return (
     <div
       className={classes.aspectRatio}

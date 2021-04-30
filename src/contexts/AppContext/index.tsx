@@ -1,7 +1,5 @@
 import { createContext, useContext, useEffect } from "react";
-import { useAsync, useMap } from "react-use";
-import { Actions } from "react-use/lib/useMap";
-import { fetchAccount } from "../../services/fetchAccount";
+import { useMap } from "react-use";
 import { fetchBoardOwnerAccount } from "../../services/fetchBoardOwnerAccount";
 import { monday } from "../../services/monday";
 import { AccountInfo } from "../../services/types";
@@ -65,7 +63,7 @@ export const AppProvider = ({ children }) => {
       .catch((error) => {
         setStatus("account", error);
       });
-  }, [map.context?.boardId]);
+  }, [set, setStatus, map.context?.boardId]);
   useEffect(() => {
     monday.listen("context", (res) => {
       setStatus("context", "fulfilled");
@@ -82,7 +80,7 @@ export const AppProvider = ({ children }) => {
       monday._clearListeners();
       console.log("Listeners were cleared");
     };
-  }, []);
+  }, [set, setStatus]);
   return <AppContext.Provider value={map}>{children}</AppContext.Provider>;
 };
 

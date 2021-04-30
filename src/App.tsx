@@ -1,11 +1,5 @@
-import Button from "monday-ui-react-core/dist/Button";
-import { Avatar } from "./components/Avatar";
 import { Grid } from "./components/Grid";
-import { useBoardUsers } from "./hooks/useBoardUsers";
 import { PlayingCard } from "./components/PlayingCard";
-import { useEffect } from "react";
-import { monday } from "./services/monday";
-import { pickCard } from "./hooks/useStorage";
 import { Intro } from "./components/Intro";
 import { AppProvider } from "./contexts/AppContext";
 
