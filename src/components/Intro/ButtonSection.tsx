@@ -1,15 +1,22 @@
 import classes from "./index.module.css";
 import Button from "monday-ui-react-core/dist/Button";
-import Loader from "monday-ui-react-core/dist/Loader";
 import { useAsync, useAsyncFn } from "react-use";
 import { createBoard } from "../../services/createBoard";
-import { useEffect } from "react";
 import MoveArrowRight from "monday-ui-react-core/dist/icons/MoveArrowRight";
+import { getRandomEmojie } from "../../services/getRandomEmojie";
+import { makeBoardUrl } from "../../services/makeBoardUrl";
+
+const generateBoardName = () => {
+  return getRandomEmojie() + " " + "Poker Planning Board";
+};
 
 export const ButtonSection = ({ severity }) => {
   const [{ value, loading, error }, createNewBoard] = useAsyncFn(
-    async () => await createBoard("Poker Planning Board")
+    async () => await createBoard(generateBoardName())
   );
+
+  console.log(value);
+
   // console.log(value, window);
   return (
     <div className={classes.buttons}>
@@ -23,11 +30,17 @@ export const ButtonSection = ({ severity }) => {
               if (loading) {
                 return;
               }
-              createNewBoard();
+              if (!value) {
+                createNewBoard();
+              }
+              if (value) {
+                const boardUrl = makeBoardUrl(value);
+                window.open(boardUrl, "tab");
+              }
             }}
           >
-            Create a New Board{" "}
-            <MoveArrowRight className={classes.buttonRightIcon} />
+            {value ? "Go to The Board" : "Create a New Board"}
+            {value && <MoveArrowRight className={classes.buttonRightIcon} />}
           </Button>
           <Button kind="tertiary" size="small" disabled>
             Use Current Board <i>&nbsp;(soon)</i>

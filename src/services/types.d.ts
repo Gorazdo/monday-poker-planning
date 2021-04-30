@@ -4,6 +4,14 @@ export type AccountInfo = {
   slug: string;
 };
 
+export type Board = {
+  id: string;
+  name: string;
+  owner: {
+    account: AccountInfo;
+  };
+};
+
 export type BoardItem = {
   id: string;
   name: string;
@@ -11,6 +19,16 @@ export type BoardItem = {
     id: number;
     name: string;
   };
+};
+
+export type BoardColumn = {
+  id: string;
+  title: string;
+  type: string;
+  archived: string;
+  settings_str: string;
+  pos: null | string;
+  width: null | number;
 };
 
 export type BoardGroup = {
@@ -25,3 +43,35 @@ export type BoardSummaryType = {
   items: BoardItem[];
   groups: BoardGroup[];
 };
+
+export type ColumnType =
+  | "auto_number"
+  | "checkbox"
+  | "country"
+  | "color_picker"
+  | "creation_log"
+  | "date"
+  | "dropdown"
+  | "email"
+  | "file"
+  | "hour"
+  | "item_id"
+  | "last_updated"
+  | "link"
+  | "location"
+  | "long_text"
+  | "numbers"
+  | "people"
+  | "phone"
+  | "progress"
+  | "rating"
+  | "status"
+  | "team"
+  | "tags"
+  | "text"
+  | "timeline"
+  | "time_tracking"
+  | "vote"
+  | "week"
+  | "world_clock"
+  | "integration";

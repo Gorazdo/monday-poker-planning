@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect } from "react";
 import { useAsync, useMap } from "react-use";
 import { Actions } from "react-use/lib/useMap";
 import { fetchAccount } from "../../services/fetchAccount";
+import { fetchBoardOwnerAccount } from "../../services/fetchBoardOwnerAccount";
 import { monday } from "../../services/monday";
 import { AccountInfo } from "../../services/types";
 
@@ -52,7 +53,11 @@ export const AppProvider = ({ children }) => {
   console.log("Statuses:", status);
   console.groupEnd();
   useEffect(() => {
-    fetchAccount()
+    if (!map.context?.boardId) {
+      return;
+    }
+    const boardId = Number(map.context.boardId);
+    fetchBoardOwnerAccount(boardId)
       .then((account) => {
         setStatus("account", "fulfilled");
         set("account", account);
@@ -60,7 +65,7 @@ export const AppProvider = ({ children }) => {
       .catch((error) => {
         setStatus("account", error);
       });
-  }, []);
+  }, [map.context?.boardId]);
   useEffect(() => {
     monday.listen("context", (res) => {
       setStatus("context", "fulfilled");
