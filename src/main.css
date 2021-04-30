@@ -8,5 +8,14 @@ body {
   width: 100%;
   overflow: hidden;
   height: 100%;
-  background-color: rgb(180, 180, 180);
+  background-color: #f5f6f8;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin-block-start: 0;
+  margin-block-end: 0;
 }

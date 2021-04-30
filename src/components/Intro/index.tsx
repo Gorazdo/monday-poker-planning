@@ -1,76 +1,74 @@
+import classes from "./index.module.css";
 import AttentionBox from "monday-ui-react-core/dist/AttentionBox";
-import { useBoardSummary } from "../../hooks/useBoard";
+import { PopupContent } from "../PopupContent";
 import { Typography } from "../Typography";
+import { InlineTooltip } from "../InlineTooltip";
+import { plural } from "../../hooks/usePlural";
+import { useUniqueAuthors } from "./useUniqueAuthors";
+import { useSeverity } from "./useSeverity";
+import { ButtonSection } from "./ButtonSection";
+import { useAsync } from "react-use";
+import { fetchBoardSummary } from "../../services/fetchBoardSummary";
+import { useBoardId } from "../../contexts/AppContext";
 
 export const Intro = () => {
-  const { value, loading, error } = useBoardSummary();
+  const boardId = useBoardId();
+  const { value, loading, error } = useAsync(async () => {
+    return await fetchBoardSummary(boardId);
+  }, [boardId]);
   return (
     <section>
-      <AttentionBox
-        title={loading ? "We gather information..." : "Important"}
-        text="Test"
-        type="primary"
-      />
-      {value && <BoardSummary {...value} />}
-      <Typography variant="h1">Hi!</Typography>
-      <Typography variant="p" gutterBottom>
-        Let's prepare your board first
-      </Typography>
-      <Typography variant="p" gutterBottom>
-        We will modify your board
-      </Typography>
+      {value && (
+        <div className={classes.popupWrapper}>
+          <BoardSummary {...value} />
+        </div>
+      )}
     </section>
   );
 };
 
 const BoardSummary = ({ name, items, groups }) => {
-  console.log(items, groups);
-  const uniqueCreators = Array.from(
-    new Set(
-      items.filter((item) => item.creator).map((item) => item.creator.name)
-    )
-  );
-  if (uniqueCreators.length === 1) {
-    if (
-      (items.length === 5 && groups.length === 2) ||
-      (items.length === 0 && groups.length === 0)
-    ) {
-      return (
-        <>
-          <Typography variant="h1">{name}</Typography>
-          <Typography variant="h2">
-            We found {items.length} items in {groups.length} groups
-          </Typography>
-          <Typography variant="h3">Looks like it's an empty board</Typography>
-        </>
-      );
-    }
-    return (
-      <>
-        <Typography variant="h1">{name}</Typography>
-        <Typography variant="h2">
-          We found {items.length} items in {groups.length} groups
-        </Typography>
-        <Typography variant="h3">
-          All of these items were created by {uniqueCreators[0]}
-        </Typography>
-      </>
-    );
-  }
+  const authors = useUniqueAuthors(items);
+  const severity = useSeverity({ items, groups, authors });
+
   return (
-    <>
-      <Typography variant="h1">{name}</Typography>
-      <Typography variant="h2">
-        We found {items.length} items in {groups.length} groups
+    <PopupContent>
+      <Typography variant="h1" gutterBottom>
+        {severity === "success" ? (
+          <>
+            This <Board name={name} /> is ready!
+          </>
+        ) : (
+          <>
+            This <Board name={name} /> seems&nbsp;to&nbsp;be in&nbsp;use
+          </>
+        )}
       </Typography>
-      <Typography variant="h3">
-        Items are created by {uniqueCreators.length} persons:{" "}
-        {uniqueCreators.join(", ")}
-      </Typography>
-      <Typography variant="h3">
-        Looks like it's better to create a new board, otherwise you will loose
-        all your data
-      </Typography>
-    </>
+      <Typography variant="h3">How to use our app safely?</Typography>
+      <ol>
+        <li>Create a New Board</li>
+        <li>Add our app on the New Board</li>
+        <li>Have fun!</li>
+      </ol>
+      <AttentionBox
+        title={
+          severity === "success"
+            ? "The app will store data in this board"
+            : "All data will be cleared"
+        }
+        text={`
+            Our plugin uses the whole board to keep data. All existing data (
+              ${plural("items", items)}, ${plural("groups", groups)} created by 
+              ${plural("creators", authors)}
+            ) will be cleared and overritten by Planning Poker App
+          `}
+        type={severity}
+      />
+      <ButtonSection severity={severity} />
+    </PopupContent>
   );
 };
+
+const Board = ({ name }) => (
+  <InlineTooltip content={`“${name}”`}>board</InlineTooltip>
+);

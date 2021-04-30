@@ -1,0 +1,6 @@
+.tooltiped {
+  cursor: help;
+  border-bottom-color: var(--color-wolf_gray);
+  border-bottom-style: dashed;
+  border-bottom-width: max(0.1em, 1px);
+}
