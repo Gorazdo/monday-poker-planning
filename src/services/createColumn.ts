@@ -28,7 +28,7 @@ export const STORY_POINTS = {
 
 export const VOTING_STATUSES = {
   labels: {
-    "0": "Joined",
+    "0": "Ready",
     "1": "Voting",
     "2": "Voted",
     "3": "Absent today",

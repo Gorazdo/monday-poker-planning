@@ -1,3 +1,12 @@
+export type BoardType =
+  | "default_template" // a default newly created board
+  | "empty" // a board created via API
+  | "readme" // a board created via API and filled with demo
+  | "prepared" //
+  | "planning_poker" // correctly set up board
+  | "danger" // a board with real data
+  | "unknown";
+
 export type AccountInfo = {
   id: string;
   name: string;
@@ -21,6 +30,8 @@ export type BoardItem = {
   };
 };
 
+export type BoardKind = "public" | "private" | "share";
+
 export type BoardColumn = {
   id: string;
   title: string;
@@ -40,6 +51,7 @@ export type BoardGroup = {
 export type BoardSummaryType = {
   id: string;
   name: string;
+  columns: Pick<BoardColumn, "id">[];
   items: BoardItem[];
   groups: BoardGroup[];
 };

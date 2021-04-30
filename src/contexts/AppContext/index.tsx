@@ -84,6 +84,6 @@ export const AppProvider = ({ children }) => {
   return <AppContext.Provider value={map}>{children}</AppContext.Provider>;
 };
 
-export const useBoardId = (): number => {
-  return Number(useContext(AppContext).context?.boardId ?? DEV_BOARD_ID);
+export const useBoardId = (): string => {
+  return String(useContext(AppContext).context?.boardId ?? DEV_BOARD_ID);
 };
