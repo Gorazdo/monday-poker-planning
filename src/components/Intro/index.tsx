@@ -103,11 +103,7 @@ const StrategySwitcher = ({ boardSummaryData, boardType }) => {
     // User has run app after reading Readme group
     // We need to clean up readme stuff and populate board
     // and show real application
-    return (
-      <BoardProvider boardType={boardType}>
-        <PlayingBoard />
-      </BoardProvider>
-    );
+    return <PlayingBoard boardType={boardType} />;
   }
   return (
     <div className={classes.popupWrapper}>

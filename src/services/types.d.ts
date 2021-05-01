@@ -1,3 +1,5 @@
+import { VOTING_STATUSES, VOTING_STATUS_COLUMN_PROPS } from "./createColumn";
+
 export type BoardType =
   | "default_template" // a default newly created board
   | "empty" // a board created via API
@@ -65,6 +67,21 @@ export type User = {
   name: string;
   title: null | string;
   photo_thumb: string;
+};
+
+export type RowValues = {
+  voting_status: typeof VOTING_STATUSES[number];
+  round_1: number;
+  round_2: number;
+  round_3: number;
+  player: number;
+};
+
+export type Player = {
+  voting_status: RowValues["voting_status"];
+  name: User["name"];
+  id: User["id"];
+  vote: Card["value"];
 };
 
 export type ColumnType =

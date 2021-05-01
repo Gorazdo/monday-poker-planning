@@ -21,12 +21,12 @@ export const createColumnCreator = (boardId: Board["id"]) => async (
   return response.data.create_column;
 };
 
-export const STORY_POINTS = {
+export const STORY_POINTS_COLUMN_PROPS = {
   function: "median",
   unit: { symbol: "custom", custom_unit: " SP", direction: "right" },
 };
 
-export const VOTING_STATUSES = {
+export const VOTING_STATUS_COLUMN_PROPS = {
   labels: {
     "0": "Ready",
     "1": "Voting",
@@ -40,3 +40,5 @@ export const VOTING_STATUSES = {
     "3": { color: "#AD967A", border: "#AD967A", var_name: "corona" },
   },
 };
+
+export const VOTING_STATUSES = Object.values(VOTING_STATUS_COLUMN_PROPS.labels);

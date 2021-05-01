@@ -1,16 +1,19 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useMap } from "react-use";
 import { useConsole } from "../../hooks/useContextConsole";
+import { useMondayListenerEffect } from "../../hooks/useMondayListenerEffect";
 import { prepareNewlyCreatedBoard } from "../../services/createBoard";
 import { fetchUsers } from "../../services/fetchUsers";
 import { monday } from "../../services/monday";
-import { StatusMap, User } from "../../services/types";
+import { Player, StatusMap, User } from "../../services/types";
 import { useBoardId } from "../AppContext";
 
 export const BoardContext = createContext<BoardState>(null);
 type BoardState = {
-  events: any[];
-  users: User[];
+  sessionStarted: boolean;
+  round: number;
+  players: Record<User["id"], Player>;
+  allUsers: User[];
 };
 
 export const BoardProvider = ({ children, boardType }) => {
@@ -18,11 +21,13 @@ export const BoardProvider = ({ children, boardType }) => {
     boardType === "planning_poker"
   );
   const [status, { set: setStatus }] = useMap<StatusMap>({
-    users: "pending",
+    allUsers: "pending",
   });
   const [map, { set }] = useMap<BoardState>({
-    events: [],
-    users: [],
+    sessionStarted: false,
+    round: 1,
+    players: {},
+    allUsers: [],
   });
   const boardId = useBoardId();
   useConsole("BoardContext", status, map);
@@ -40,25 +45,14 @@ export const BoardProvider = ({ children, boardType }) => {
   useEffect(() => {
     fetchUsers()
       .then((users) => {
-        set("users", users);
-        setStatus("users", "fulfilled");
+        set("allUsers", users);
+        setStatus("allUsers", "fulfilled");
       })
       .catch((error) => {
-        setStatus("users", error);
+        setStatus("allUsers", error);
       });
   }, [set, setStatus]);
-  useEffect(() => {
-    monday.listen("events", (res) => {
-      setStatus("events", "fulfilled");
-      console.log(res.data);
-    });
 
-    return () => {
-      console.log("BoardProvider was unmounted", monday);
-      // @ts-ignore
-      monday._clearListeners();
-      console.log("Listeners were cleared");
-    };
-  }, [set, setStatus]);
+  useMondayListenerEffect("events", console.log);
   return <BoardContext.Provider value={map}>{children}</BoardContext.Provider>;
 };

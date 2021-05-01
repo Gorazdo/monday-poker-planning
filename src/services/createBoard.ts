@@ -1,8 +1,8 @@
 import { PP_README_GROUP_NAME } from "../constants/boards";
 import {
   createColumnCreator,
-  VOTING_STATUSES,
-  STORY_POINTS,
+  VOTING_STATUS_COLUMN_PROPS,
+  STORY_POINTS_COLUMN_PROPS,
 } from "./createColumn";
 import { createGroup } from "./createGroup";
 import { createItemCreator } from "./createItem";
@@ -52,10 +52,18 @@ const clearGroups = async (boardId: Board["id"]) => {
 const createCommonColumns = async (createColumn) => {
   const columns = [];
   // Unfortunately, sending them simultaniously using Promise.all produces unreliable results
-  columns.push(await createColumn("Voting Status", "status", VOTING_STATUSES));
-  columns.push(await createColumn("Round 1", "numbers", STORY_POINTS));
-  columns.push(await createColumn("Round 2", "numbers", STORY_POINTS));
-  columns.push(await createColumn("Round 3", "numbers", STORY_POINTS));
+  columns.push(
+    await createColumn("Voting Status", "status", VOTING_STATUS_COLUMN_PROPS)
+  );
+  columns.push(
+    await createColumn("Round 1", "numbers", STORY_POINTS_COLUMN_PROPS)
+  );
+  columns.push(
+    await createColumn("Round 2", "numbers", STORY_POINTS_COLUMN_PROPS)
+  );
+  columns.push(
+    await createColumn("Round 3", "numbers", STORY_POINTS_COLUMN_PROPS)
+  );
   columns.push(await createColumn("Session Duration", "time_tracking"));
   console.log("created columns", columns);
   return columns;

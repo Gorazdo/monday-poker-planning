@@ -6,6 +6,7 @@ import { Typography } from "../../library/Typography";
 import { Grid } from "../../library/Grid";
 import { useState } from "react";
 import { Card } from "../../constants/cards";
+import { pickCard } from "../../services/game/pickCard";
 
 export const CardPickerPane = () => {
   const { cardsSequence } = useSettings();
@@ -24,6 +25,7 @@ export const CardPickerPane = () => {
               variant="face"
               onChange={(value) => {
                 setSelected(value);
+                pickCard(123, 123, 2, {});
               }}
             />
           </div>

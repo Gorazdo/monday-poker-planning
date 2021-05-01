@@ -1,14 +1,19 @@
-import { createContext, useContext, useEffect } from "react";
+import LinearProgressBar from "monday-ui-react-core/dist/LinearProgressBar";
+import { createContext, useCallback, useContext, useEffect } from "react";
 import { useMap } from "react-use";
 import { useConsole } from "../../hooks/useContextConsole";
+import { useLoadingPercent } from "../../hooks/useLoadingStatus";
+import { useMondayListenerEffect } from "../../hooks/useMondayListenerEffect";
 import { fetchBoardOwnerAccount } from "../../services/fetchBoardOwnerAccount";
+import { fetchMe } from "../../services/fetchMe";
 import { monday } from "../../services/monday";
-import { AccountInfo, StatusMap } from "../../services/types";
+import { AccountInfo, StatusMap, User } from "../../services/types";
 
 export const AppContext = createContext<AppState>(null);
 type AppState = {
   account?: AccountInfo;
   settings?: any;
+  me?: User;
   context?: {
     boardIds: number[];
     boardId?: string; // missing in app preview
@@ -27,14 +32,24 @@ type AppState = {
 const DEV_BOARD_ID = "1257333489";
 
 export const AppProvider = ({ children }) => {
-  const [status, { set: setStatus }] = useMap<StatusMap>({
+  const [statuses, { set: setStatus }] = useMap<StatusMap>({
     context: "pending",
     settings: "pending",
     account: "pending",
+    me: "pending",
   });
   const [map, { set }] = useMap<AppState>({});
-  useConsole("AppContext", status, map);
+  useConsole("AppContext", statuses, map);
+  const loadingPercent = useLoadingPercent(statuses);
   useEffect(() => {
+    fetchMe()
+      .then((me) => {
+        setStatus("me", "fulfilled");
+        set("me", me);
+      })
+      .catch((error) => {
+        setStatus("me", error);
+      });
     if (!map.context?.boardId) {
       return;
     }
@@ -47,37 +62,44 @@ export const AppProvider = ({ children }) => {
         setStatus("account", error);
       });
   }, [set, setStatus, map.context?.boardId]);
-  useEffect(() => {
-    monday.listen("context", (res) => {
-      setStatus("context", "fulfilled");
-      if (res.data.boardId === undefined) {
-        // dev mode
-        set("context", {
-          boardId: res.data.boardIds[0] ?? DEV_BOARD_ID,
-          ...res.data,
-        });
-      } else {
-        set("context", res.data);
-      }
-    });
 
-    monday.listen("settings", (res) => {
-      setStatus("settings", "fulfilled");
-      set("settings", res.data);
-    });
-    return () => {
-      console.log("AppProvider was demounted", monday);
-      // @ts-ignore
-      monday._clearListeners();
-      console.log("Listeners were cleared");
-    };
-  }, [set, setStatus]);
-  if (!map.context?.boardId) {
-    return null;
+  const contextCallback = useCallback((res) => {
+    setStatus("context", "fulfilled");
+    if (res.data.boardId === undefined) {
+      // dev mode
+      set("context", {
+        boardId: res.data.boardIds[0] ?? DEV_BOARD_ID,
+        ...res.data,
+      });
+    } else {
+      set("context", res.data);
+    }
+  }, []);
+  const settingsCallback = useCallback((res) => {
+    setStatus("settings", "fulfilled");
+    set("settings", res.data);
+  }, []);
+
+  useMondayListenerEffect("context", contextCallback);
+  useMondayListenerEffect("settings", settingsCallback);
+
+  if (Object.values(statuses).every((status) => status === "fulfilled")) {
+    return <AppContext.Provider value={map}>{children}</AppContext.Provider>;
   }
-  return <AppContext.Provider value={map}>{children}</AppContext.Provider>;
+  return (
+    <LinearProgressBar
+      min={0}
+      max={100}
+      value={loadingPercent}
+      ariaLabel="Application is loading"
+    />
+  );
 };
 
 export const useBoardId = (): string => {
   return useContext(AppContext).context.boardId;
+};
+
+export const useMe = (): User => {
+  return useContext(AppContext).me;
 };
