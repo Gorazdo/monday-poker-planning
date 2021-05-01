@@ -1,0 +1,20 @@
+.root {
+  border-radius: 16px;
+  padding: 48px;
+  padding-bottom: 24px;
+  box-shadow: 0px 15px 50px -10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  animation: fadein 200ms ease-in;
+}
+
+@keyframes fadein {
+  from {
+    transform: translateY(5%) rotateX(5deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0%) rotateX(0);
+    opacity: 1;
+  }
+}

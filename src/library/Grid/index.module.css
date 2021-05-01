@@ -1,0 +1,32 @@
+.root {
+  display: grid;
+  grid-gap: 8px;
+}
+
+.row {
+  grid-auto-columns: min-content;
+  grid-auto-flow: column;
+}
+
+.center {
+  place-items: center;
+}
+
+.cardsPicker {
+  display: grid;
+  padding-top: var(--spacing-large);
+  grid-gap: var(--spacing-large);
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(calc((10vh * 5 + 10vw) / 7), 1fr)
+  );
+}
+
+.cardsBoard {
+  padding: var(--spacing-xl) 0;
+  grid-gap: var(--spacing-large);
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(calc((10vh * 5 + 10vw) / 4), 1fr)
+  );
+}

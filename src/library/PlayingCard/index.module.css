@@ -1,0 +1,115 @@
+.aspectRatio {
+  padding-top: 140%;
+  position: relative;
+  perspective: 200px;
+}
+
+.aspectRatioInner {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  left: 0;
+  width: 100%;
+}
+
+.root {
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  background: transparent;
+  transition: 200ms transform;
+  transform-style: preserve-3d;
+}
+
+.root:focus {
+  outline: none;
+}
+.root:focus .content {
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.root:focus .content.face {
+  transform: scale(0.95) rotateY(180deg);
+}
+.root:focus .content.back {
+  transform: scale(0.95);
+}
+
+.rootFaceUp {
+  transform: rotateY(0);
+}
+
+.rootFaceDown {
+  transform: rotateY(180deg);
+}
+
+.content {
+  user-select: none;
+  background-color: var(--color-snow_white);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--border-radius-big);
+  box-shadow: var(--box-shadow-small);
+
+  transition: 200ms transform;
+  display: flex;
+  align-items: stretch;
+  backface-visibility: hidden;
+  justify-content: center;
+  padding: calc(clamp(5px, 5%, 10px));
+}
+
+.rootSelected .content {
+  box-shadow: none;
+  border: 2px solid var(--primary-text-color);
+  padding: 3px;
+}
+
+.innerContent {
+  flex-grow: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: 200ms background-color;
+  border-radius: calc(var(--border-radius-big) * 0.75);
+  padding: var(--spacing-small);
+  display: grid;
+  place-items: center;
+  font-size: var(--spacing-xl);
+}
+
+.face .innerContent {
+  background-color: var(--color-highlight);
+}
+
+.face:hover {
+  transform: rotateY(185deg);
+}
+
+.face:active {
+  transform: rotateY(190deg);
+}
+
+.face {
+  transform: rotateY(180deg);
+}
+
+.back .innerContent {
+  background-color: var(--color-very_light_gray);
+}
+
+.rootSelected .face .innerContent {
+  background-color: var(--primary-color);
+  color: var(--color-snow_white);
+}
+
+.back:hover {
+  transform: rotateY(5deg);
+}
+
+.back:active {
+  transform: rotateY(10deg);
+}

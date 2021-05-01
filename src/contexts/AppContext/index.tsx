@@ -1,17 +1,17 @@
 import { createContext, useContext, useEffect } from "react";
 import { useMap } from "react-use";
+import { useLoadingPercent } from "../../hooks/useLoadingStatus";
 import { fetchBoardOwnerAccount } from "../../services/fetchBoardOwnerAccount";
 import { monday } from "../../services/monday";
-import { AccountInfo } from "../../services/types";
+import { AccountInfo, StatusMap } from "../../services/types";
 
 export const AppContext = createContext<AppState>(null);
-type StatusMap = Record<string, "pending" | "fulfilled" | Error>;
 type AppState = {
   account?: AccountInfo;
   settings?: any;
   context?: {
     boardIds: number[];
-    boardId?: number | string; // missing in app preview
+    boardId?: string; // missing in app preview
     instanceType: string | "board_view";
     theme: string | "light";
     user: {
@@ -23,19 +23,8 @@ type AppState = {
     viewMode: "fullscreen" | "splited";
   };
 };
-const DEV_BOARD_ID = 1249871037;
-
-const useLoadingStatus = (statuses: StatusMap): number => {
-  const values = Object.values(statuses);
-  const total = values.length;
-  const fulfilled = values.filter((status) => status === "fulfilled").length;
-  return fulfilled / total;
-};
-
-const useLoadingPercent = (statuses: StatusMap): number => {
-  const value = useLoadingStatus(statuses);
-  return Math.round(value * 100);
-};
+// const DEV_BOARD_ID = "1249871037";
+const DEV_BOARD_ID = "1257333489";
 
 export const AppProvider = ({ children }) => {
   const [status, { set: setStatus }] = useMap<StatusMap>({
@@ -54,20 +43,28 @@ export const AppProvider = ({ children }) => {
     if (!map.context?.boardId) {
       return;
     }
-    const boardId = Number(map.context.boardId);
-    fetchBoardOwnerAccount(boardId)
-      .then((account) => {
-        setStatus("account", "fulfilled");
-        set("account", account);
-      })
-      .catch((error) => {
-        setStatus("account", error);
-      });
+    console.log(map.context.boardId);
+    // fetchBoardOwnerAccount(Number(map.context.boardId))
+    //   .then((account) => {
+    //     setStatus("account", "fulfilled");
+    //     set("account", account);
+    //   })
+    //   .catch((error) => {
+    //     setStatus("account", error);
+    //   });
   }, [set, setStatus, map.context?.boardId]);
   useEffect(() => {
     monday.listen("context", (res) => {
       setStatus("context", "fulfilled");
-      set("context", res.data);
+      if (res.data.boardId === undefined) {
+        // dev mode
+        set("context", {
+          boardId: res.data.boardIds[0] ?? DEV_BOARD_ID,
+          ...res.data,
+        });
+      } else {
+        set("context", res.data);
+      }
     });
 
     monday.listen("settings", (res) => {
@@ -81,9 +78,12 @@ export const AppProvider = ({ children }) => {
       console.log("Listeners were cleared");
     };
   }, [set, setStatus]);
+  if (!map.context?.boardId) {
+    return null;
+  }
   return <AppContext.Provider value={map}>{children}</AppContext.Provider>;
 };
 
 export const useBoardId = (): string => {
-  return String(useContext(AppContext).context?.boardId ?? DEV_BOARD_ID);
+  return useContext(AppContext).context.boardId;
 };

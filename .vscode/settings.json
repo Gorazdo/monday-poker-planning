@@ -1,0 +1,9 @@
+{
+  "cssVarriablesAutocomplete.files": [
+    "./node_modules/monday-ui-react-core/dist/main.css"
+  ],
+  "cssVariables.lookupFiles": [
+    "../node_modules/monday-ui-react-core/dist/main.css",
+    "src/main.css"
+  ]
+}

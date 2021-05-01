@@ -1,7 +1,16 @@
 .popupWrapper {
+  box-sizing: border-box;
   display: grid;
   place-items: center;
   padding: 10vw;
+  height: 100vh;
+  perspective: 500px;
+}
+
+.loaderWrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
 }
 
 .buttons {

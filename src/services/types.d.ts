@@ -56,6 +56,17 @@ export type BoardSummaryType = {
   groups: BoardGroup[];
 };
 
+export type User = {
+  id: number;
+  is_admin: boolean;
+  is_pending: boolean;
+  is_view_only: boolean;
+  is_guest: boolean;
+  name: string;
+  title: null | string;
+  photo_thumb: string;
+};
+
 export type ColumnType =
   | "auto_number"
   | "checkbox"
@@ -87,3 +98,5 @@ export type ColumnType =
   | "week"
   | "world_clock"
   | "integration";
+
+export type StatusMap = Record<string, "pending" | "fulfilled" | Error>;

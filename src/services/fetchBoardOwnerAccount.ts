@@ -1,9 +1,10 @@
 import { monday } from "./monday";
-import { AccountInfo } from "./types";
+import { AccountInfo, Board } from "./types";
 
 export const fetchBoardOwnerAccount = async (
-  id: number
+  id: Board["id"]
 ): Promise<AccountInfo> => {
+  console.log({ id });
   const response = await monday.api(`#graphql
     {
       boards (ids: ${id}) {

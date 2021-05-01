@@ -1,8 +1,8 @@
 import { monday } from "./monday";
-import { BoardSummaryType } from "./types";
+import { Board, BoardSummaryType } from "./types";
 
 export const fetchBoardSummary = async (
-  id: string
+  id: Board["id"]
 ): Promise<void | BoardSummaryType> => {
   const response = await monday.api(`#graphql
      {

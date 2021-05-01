@@ -2,20 +2,21 @@ import AttentionBox from "monday-ui-react-core/dist/AttentionBox";
 import Loader from "monday-ui-react-core/dist/Loader";
 import { useAsync } from "react-use";
 import classes from "./index.module.css";
-import { PopupContent } from "../PopupContent";
-import { Typography } from "../Typography";
-import { InlineTooltip } from "../InlineTooltip";
+import { PopupContent } from "../../library/PopupContent";
+import { Typography } from "../../library/Typography";
+import { InlineTooltip } from "../../library/InlineTooltip";
 import { plural } from "../../hooks/usePlural";
-import { useUniqueAuthors } from "./useUniqueAuthors";
-import { useSeverity } from "./useSeverity";
 import {
-  ButtonSection,
   CreateNewBoardButton,
   StartFromDefaultBoardButton,
 } from "./ButtonSection";
 import { fetchBoardSummary } from "../../services/fetchBoardSummary";
 import { useBoardId } from "../../contexts/AppContext";
 import { detectBoardType } from "../../utils/detectBoardType";
+import { Grid } from "../../library/Grid";
+import { BoardDebug } from "./BoardDebug";
+import { BoardProvider } from "../../contexts/BoardContext";
+import { PlayingBoard } from "../PlayingBoard";
 
 export const Intro = () => {
   const boardId = useBoardId();
@@ -23,11 +24,23 @@ export const Intro = () => {
     return await fetchBoardSummary(boardId);
   }, [boardId]);
 
-  if (loading) {
-    return <Loader />;
+  if (loading && !value) {
+    return (
+      <div className={classes.popupWrapper}>
+        <div className={classes.loaderWrapper}>
+          <Loader />
+        </div>
+      </div>
+    );
   }
   if (value) {
-    return <StrategySwitcher boardSummaryData={value} />;
+    const boardType = detectBoardType(value);
+    return (
+      <>
+        <BoardDebug boardSummaryData={value} boardType={boardType} />
+        <StrategySwitcher boardSummaryData={value} boardType={boardType} />
+      </>
+    );
   }
   return (
     <AttentionBox
@@ -38,8 +51,7 @@ export const Intro = () => {
   );
 };
 
-const StrategySwitcher = ({ boardSummaryData }) => {
-  const boardType = detectBoardType(boardSummaryData);
+const StrategySwitcher = ({ boardSummaryData, boardType }) => {
   const { name } = boardSummaryData;
   if (boardType === "danger") {
     return (
@@ -54,7 +66,9 @@ const StrategySwitcher = ({ boardSummaryData }) => {
             <li>Add our app on the New Board</li>
             <li>Have fun!</li>
           </ol>
-          <CreateNewBoardButton />
+          <Grid variant="center">
+            <CreateNewBoardButton />
+          </Grid>
         </PopupContent>
       </div>
     );
@@ -78,7 +92,9 @@ const StrategySwitcher = ({ boardSummaryData }) => {
             ) will be cleared and overritten by Planning Poker App
           `}
           />
-          <StartFromDefaultBoardButton />
+          <Grid variant="center">
+            <StartFromDefaultBoardButton />
+          </Grid>
         </PopupContent>
       </div>
     );
@@ -87,12 +103,20 @@ const StrategySwitcher = ({ boardSummaryData }) => {
     // User has run app after reading Readme group
     // We need to clean up readme stuff and populate board
     // and show real application
-    return null;
+    return (
+      <BoardProvider>
+        <PlayingBoard />
+      </BoardProvider>
+    );
   }
 
   if (boardType === "planning_poker") {
     // showing real application
-    return null;
+    return (
+      <BoardProvider>
+        <PlayingBoard />
+      </BoardProvider>
+    );
   }
   return (
     <div className={classes.popupWrapper}>
