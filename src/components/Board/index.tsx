@@ -7,6 +7,7 @@ import { useUsers } from "../../contexts/BoardContext/useUsers";
 import { Avatar } from "../../library/Avatar";
 import { User } from "../../services/types";
 import { CARD_BACKS } from "../../constants/cards";
+import { useBoardId } from "../../contexts/AppContext";
 
 const useCardBack = (index: number): typeof CARD_BACKS[number] => {
   return CARD_BACKS[index % CARD_BACKS.length];
@@ -14,6 +15,11 @@ const useCardBack = (index: number): typeof CARD_BACKS[number] => {
 
 export const Board = () => {
   const users = useUsers();
+  const boardId = useBoardId();
+
+  const handleStart = () => {
+    console.log(boardId);
+  };
   return (
     <section className={classes.root}>
       <div className={classes.toolbar}>
@@ -21,7 +27,9 @@ export const Board = () => {
           The voting subject
         </Typography>
         <Grid variant="row">
-          <Button kind="secondary">Start New Game</Button>
+          <Button kind="secondary" onClick={handleStart}>
+            Start New Game
+          </Button>
           <Button>Reveal Cards</Button>
         </Grid>
       </div>

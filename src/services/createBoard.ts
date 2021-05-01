@@ -81,6 +81,7 @@ export const addReadmeInfo = async (boardId: Board["id"]) => {
 };
 
 export const prepareNewlyCreatedBoard = async (boardId: Board["id"]) => {
+  await clearGroups(boardId);
   const createColumn = createColumnCreator(boardId);
   await createCommonColumns(createColumn);
   await createColumn("Player", "people");

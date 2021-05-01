@@ -1,9 +1,11 @@
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useMap } from "react-use";
-import { useLoadingPercent } from "../../hooks/useLoadingStatus";
+import { useConsole } from "../../hooks/useContextConsole";
+import { prepareNewlyCreatedBoard } from "../../services/createBoard";
 import { fetchUsers } from "../../services/fetchUsers";
 import { monday } from "../../services/monday";
 import { StatusMap, User } from "../../services/types";
+import { useBoardId } from "../AppContext";
 
 export const BoardContext = createContext<BoardState>(null);
 type BoardState = {
@@ -11,7 +13,10 @@ type BoardState = {
   users: User[];
 };
 
-export const BoardProvider = ({ children }) => {
+export const BoardProvider = ({ children, boardType }) => {
+  const [hasPrepared, setHasPrepared] = useState(
+    boardType === "planning_poker"
+  );
   const [status, { set: setStatus }] = useMap<StatusMap>({
     users: "pending",
   });
@@ -19,12 +24,19 @@ export const BoardProvider = ({ children }) => {
     events: [],
     users: [],
   });
-  console.groupCollapsed(
-    `BoardProvider is rerendered | ${useLoadingPercent(status)}%`
-  );
-  console.log("New state:", map);
-  console.log("Statuses:", status);
-  console.groupEnd();
+  const boardId = useBoardId();
+  useConsole("BoardContext", status, map);
+
+  useEffect(() => {
+    if (boardType === "readme" && !hasPrepared) {
+      prepareNewlyCreatedBoard(boardId).then((res) => {
+        setHasPrepared(true);
+      });
+    } else {
+      console.log("board has prepared", { boardType, hasPrepared });
+    }
+  }, [boardId, boardType, hasPrepared]);
+
   useEffect(() => {
     fetchUsers()
       .then((users) => {

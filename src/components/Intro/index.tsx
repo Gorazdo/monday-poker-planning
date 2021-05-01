@@ -99,21 +99,12 @@ const StrategySwitcher = ({ boardSummaryData, boardType }) => {
       </div>
     );
   }
-  if (boardType === "readme") {
+  if (boardType === "readme" || boardType === "planning_poker") {
     // User has run app after reading Readme group
     // We need to clean up readme stuff and populate board
     // and show real application
     return (
-      <BoardProvider>
-        <PlayingBoard />
-      </BoardProvider>
-    );
-  }
-
-  if (boardType === "planning_poker") {
-    // showing real application
-    return (
-      <BoardProvider>
+      <BoardProvider boardType={boardType}>
         <PlayingBoard />
       </BoardProvider>
     );

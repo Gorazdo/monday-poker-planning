@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect } from "react";
 import { useMap } from "react-use";
-import { useLoadingPercent } from "../../hooks/useLoadingStatus";
+import { useConsole } from "../../hooks/useContextConsole";
 import { fetchBoardOwnerAccount } from "../../services/fetchBoardOwnerAccount";
 import { monday } from "../../services/monday";
 import { AccountInfo, StatusMap } from "../../services/types";
@@ -33,25 +33,19 @@ export const AppProvider = ({ children }) => {
     account: "pending",
   });
   const [map, { set }] = useMap<AppState>({});
-  console.groupCollapsed(
-    `AppProvider is rerendered | ${useLoadingPercent(status)}%`
-  );
-  console.log("New state:", map);
-  console.log("Statuses:", status);
-  console.groupEnd();
+  useConsole("AppContext", status, map);
   useEffect(() => {
     if (!map.context?.boardId) {
       return;
     }
-    console.log(map.context.boardId);
-    // fetchBoardOwnerAccount(Number(map.context.boardId))
-    //   .then((account) => {
-    //     setStatus("account", "fulfilled");
-    //     set("account", account);
-    //   })
-    //   .catch((error) => {
-    //     setStatus("account", error);
-    //   });
+    fetchBoardOwnerAccount(map.context.boardId)
+      .then((account) => {
+        setStatus("account", "fulfilled");
+        set("account", account);
+      })
+      .catch((error) => {
+        setStatus("account", error);
+      });
   }, [set, setStatus, map.context?.boardId]);
   useEffect(() => {
     monday.listen("context", (res) => {
