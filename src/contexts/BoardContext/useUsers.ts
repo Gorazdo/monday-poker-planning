@@ -2,5 +2,6 @@ import { useContext } from "react";
 import { BoardContext } from ".";
 
 export const useUsers = () => {
-  return useContext(BoardContext).allUsers;
+  const [{ allUsers }] = useContext(BoardContext);
+  return allUsers;
 };

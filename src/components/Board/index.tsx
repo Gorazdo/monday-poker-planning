@@ -5,62 +5,152 @@ import { Grid } from "../../library/Grid";
 import { PlayingCard } from "../../library/PlayingCard";
 import { useUsers } from "../../contexts/BoardContext/useUsers";
 import { Avatar } from "../../library/Avatar";
-import { User } from "../../services/types";
-import { CARD_BACKS } from "../../constants/cards";
+import { CARD_BACKS, Vote } from "../../constants/cards";
 import { useBoardId } from "../../contexts/AppContext";
+import { usePlayers } from "../../hooks/usePlayers";
+import clsx from "clsx";
+import { useAsyncFn, useMeasure } from "react-use";
+import { revealCard } from "../../services/game/revealCard";
+import { useContext, useState } from "react";
+import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
+import { useIAmModerator } from "../../contexts/GameContext";
+import { updateRow } from "../../services/updateRow";
+import { useSettings } from "../../contexts/AppContext/useSettings";
 
 const useCardBack = (index: number): typeof CARD_BACKS[number] => {
   return CARD_BACKS[index % CARD_BACKS.length];
 };
 
 export const Board = () => {
-  const users = useUsers();
   const boardId = useBoardId();
+  const [{ group, items, round }, boardActions] = useContext(BoardContext);
+  const moderatorItem = useModeratorItem();
+  const [endSessionState, endSessionHandler] = useAsyncFn(async () => {
+    await updateRow(boardId, moderatorItem.id, {
+      game_status: "Session ended",
+    });
+  }, [boardId, moderatorItem?.id]);
 
-  const handleStart = () => {
-    console.log(boardId);
+  const [revealed, setRevealed] = useState(false);
+
+  const [, revealCardsHandler] = useAsyncFn(async () => {
+    await Promise.all(
+      Object.values(items).map((item) =>
+        revealCard(round, {
+          boardId,
+          itemId: item.id,
+          userId: item.creator.id,
+        })
+      )
+    );
+    setRevealed(true);
+  }, [boardId, moderatorItem?.id]);
+
+  const handleNewRound = () => {
+    setRevealed(false);
+    boardActions.set("round", 2);
   };
+
+  const iAmModerator = useIAmModerator();
+
   return (
     <section className={classes.root}>
       <div className={classes.toolbar}>
-        <Typography variant="h2" gutterBottom>
-          The voting subject
-        </Typography>
-        <Grid variant="row">
-          <Button kind="secondary" onClick={handleStart}>
-            Start New Game
-          </Button>
-          <Button>Reveal Cards</Button>
-        </Grid>
-      </div>
-      <Grid variant="cardsBoard">
-        {users.length === 0 && (
-          <>
-            <UserPlayingCardStub />
-            <UserPlayingCardStub />
-          </>
+        <div>
+          <Typography variant="h2">
+            {!group ? "Loading..." : group.title}
+          </Typography>
+          <Typography variant="p" gutterBottom>
+            Round #{round}
+          </Typography>
+        </div>
+        {iAmModerator && (
+          <Grid variant="row">
+            <Button
+              kind="secondary"
+              loading={endSessionState.loading}
+              onClick={endSessionHandler}
+            >
+              End Session
+            </Button>
+            {revealed ? (
+              <Button onClick={handleNewRound}>New round</Button>
+            ) : (
+              <Button onClick={revealCardsHandler}>Reveal Cards</Button>
+            )}
+          </Grid>
         )}
-        {users
-          .sort((a, b) => b.id - a.id)
-          .map((user, index) => (
-            <UserPlayingCard key={user.id} user={user} index={index} />
-          ))}
-      </Grid>
+      </div>
+      <InteractiveBoard />
     </section>
   );
 };
 
-const UserPlayingCard = ({ user, index }) => {
-  const cardBack = useCardBack(index);
+const InteractiveBoard = () => {
+  const players = usePlayers();
+  const users = useUsers();
+  console.log({ players, users });
+  const [ref, { width }] = useMeasure();
   return (
-    <div className={classes.userCard}>
+    <div ref={ref} className={classes.cardBoard}>
+      {users.length === 0 && (
+        <>
+          <UserPlayingCardStub />
+          <UserPlayingCardStub />
+        </>
+      )}
+      {users
+        .map((user) => ({
+          ...user,
+          voting_status: players[user.id]?.voting_status,
+          sortkey: generateSortKey(user, players),
+        }))
+        .sort((a, b) => a.sortkey - b.sortkey)
+        .map((user, index) => {
+          const joined = user.id in players;
+          return (
+            <UserPlayingCard
+              key={user.id}
+              user={user}
+              vote={players[user.id]?.vote ?? null}
+              style={{
+                width: 120,
+                transform: joined
+                  ? `translateX(${(120 + 20) * index}px)`
+                  : `translateX(${width - 120 - index * 10}px)`,
+              }}
+              joined={joined}
+              voting_status={players[user.id]?.voting_status}
+            />
+          );
+        })}
+    </div>
+  );
+};
+
+const UserPlayingCard = ({ user, joined, vote, voting_status, style }) => {
+  const cardBack = useCardBack(user.id + 3);
+  const { variant, label, value } = usePlayingCardProps(vote, voting_status);
+  return (
+    <div
+      className={clsx(classes.userCard, {
+        [classes.userCardJoined]: joined,
+      })}
+      style={style}
+    >
       <PlayingCard
-        value={3}
-        label="3"
-        variant="back"
+        value={value}
+        label={label}
+        variant={variant}
         backCover={`/cards/${cardBack}.svg`}
+        voting_status={voting_status}
       />
-      <div className={classes.userCardAvatarWrapper}>
+      <div
+        className={clsx(classes.userCardAvatarWrapper, {
+          [classes.userCardAvatarWrapperModerator]:
+            voting_status === "Moderator",
+        })}
+      >
         <Avatar
           url={user.photo_thumb}
           name={user.name}
@@ -71,7 +161,28 @@ const UserPlayingCard = ({ user, index }) => {
   );
 };
 
-const UserPlayingCardStub = ({}) => {
+const usePlayingCardProps = (
+  vote: Vote | null,
+  voting_status
+): {
+  variant: "back" | "face";
+  label?: string;
+  value?: Vote;
+} => {
+  const { cardsMap } = useSettings();
+  if (vote === null || voting_status === "Moderator") {
+    return {
+      variant: "back",
+    };
+  }
+
+  return {
+    ...cardsMap[vote],
+    variant: "face",
+  };
+};
+
+const UserPlayingCardStub = () => {
   return (
     <div className={classes.userCard}>
       <PlayingCard value={0} label="0" variant="back" />
@@ -80,4 +191,15 @@ const UserPlayingCardStub = ({}) => {
       </div>
     </div>
   );
+};
+
+const generateSortKey = (user, players) => {
+  //players[user.id]?.voting_status
+  if (!players[user.id]) {
+    return 1000000000 + user.id;
+  }
+  if (players[user.id].voting_status === "Moderator") {
+    return 0;
+  }
+  return user.id;
 };

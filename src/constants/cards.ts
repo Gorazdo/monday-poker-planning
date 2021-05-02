@@ -1,4 +1,4 @@
-export const FIBONACCHI = [1, 2, 3, 5, 8, 13, 21, 34];
+export const FIBONACCHI = [1, 2, 3, 5, 8, 13, 21, 34, 55, 99];
 export const SCRUM = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100];
 
 export const EXTRA_CARDS: Card[] = [
@@ -7,8 +7,10 @@ export const EXTRA_CARDS: Card[] = [
   { value: "coffee-break", label: "I need some Coffee", fontSize: 18 },
 ];
 
+export type Vote = number | "infinity" | "coffee-break" | "what";
+
 export type Card = {
-  value: number | "infinity" | "coffee-break" | "what";
+  value: Vote;
   fontSize?: number;
   label: string;
 };
@@ -21,3 +23,5 @@ export const CARD_BACKS = [
   "green",
   "violet",
 ];
+
+export type RoundNumber = 1 | 2 | 3;

@@ -12,6 +12,7 @@ body {
   margin: 0;
 }
 
+p,
 h1,
 h2,
 h3,
@@ -251,7 +252,7 @@ body,
   --spacing-small: 8px;
   --spacing-medium: 16px;
   --spacing-large: 24px;
-  --spacing-xl: 32px;
+  --spacing-large: 32px;
   --spacing-xxl: 48px;
   --spacing-xxxl: 64px;
 }

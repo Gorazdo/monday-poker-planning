@@ -11,5 +11,5 @@ export const useMondayListenerEffect = (name, callback) => {
       monday._clearListeners();
       console.log("All listeners were cleared");
     };
-  }, [callback]);
+  }, [name, callback]);
 };

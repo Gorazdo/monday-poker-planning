@@ -1,11 +1,39 @@
 import { createItemCreator } from "../createItem";
+import { fetchGroupItemsAndValues } from "../fetchBoardItemsAndValues";
+import { fetchItem } from "../fetchItem";
+import { BoardItemWithValues } from "../types";
 
-export const joinGame = async ({ boardId, groupId, user }) => {
+type JoinGameType = {
+  item: BoardItemWithValues;
+  isModerator?: boolean;
+};
+
+export const joinGame = async ({
+  boardId,
+  groupId,
+  user,
+}): Promise<JoinGameType> => {
   const createItem = createItemCreator(boardId, groupId);
-  console.log(user.id);
-  const result = await createItem(`${user.name}'s vote panel`, {
-    voting_status: "Ready",
-    player: `"${user.id}"`,
+
+  // doublecheck that item has not been created (different device case, partial execution)
+  const currentItems = await fetchGroupItemsAndValues(boardId, groupId);
+  const currentUserItem = currentItems.find(
+    (item) => item.creator.id === user.id
+  );
+
+  if (currentUserItem) {
+    // it's been created already
+    return { item: currentUserItem };
+  }
+  console.log({ currentItems });
+  const isModerator = currentItems.length === 0;
+  const newItem = await createItem(`${user.name}'s vote panel`, {
+    voting_status: isModerator ? "Moderator" : "Joined",
+    game_status: isModerator ? "Round 1" : null,
+    player: `${user.id}`,
   });
-  return result;
+
+  const fullNewItem = await fetchItem(boardId, newItem.id);
+
+  return { item: fullNewItem, isModerator };
 };

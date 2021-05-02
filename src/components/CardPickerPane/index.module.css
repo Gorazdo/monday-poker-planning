@@ -1,4 +1,9 @@
 .root {
   background-color: var(--color-ui_grey);
-  padding: var(--spacing-xl);
+  padding: var(--spacing-large);
+}
+
+.label {
+  position: relative;
+  top: -1em;
 }

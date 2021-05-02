@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { useState } from "react";
 import { Card } from "../../constants/cards";
+import { VotingStatusType } from "../../services/createColumn";
 import classes from "./index.module.css";
 
 export interface PlayingCardProps extends Card {
@@ -9,6 +10,7 @@ export interface PlayingCardProps extends Card {
   fontSize?: number;
   variant: "face" | "back";
   selected?: boolean;
+  voting_status?: VotingStatusType;
   onChange?: (value: Card["value"], variant: "face" | "back") => void;
 }
 
@@ -30,19 +32,15 @@ export const PlayingCard: React.FC<PlayingCardProps> = ({
   value,
   faceCover,
   backCover,
+  voting_status,
   label,
   fontSize = 32,
   variant,
   selected,
   onChange,
 }) => {
-  const [rotate, setRotate] = useState(variant === "face" ? 180 : 0);
+  const [rotate] = useState(variant === "face" ? 180 : 0);
   const handleClick = (event) => {
-    // if (variant === "face") {
-    //   setRotate(rotate + 180);
-    // } else {
-    //   setRotate(rotate + 180);
-    // }
     if (typeof onChange === "function") {
       onChange(value, variant);
     }
@@ -59,25 +57,30 @@ export const PlayingCard: React.FC<PlayingCardProps> = ({
           [classes.rootFaceUp]: variant === "face",
           [classes.rootFaceDown]: variant === "back",
           [classes.rootSelected]: selected,
+          [classes.rootPale]: voting_status === "Joined",
+          [classes.rootVoted]: voting_status === "Voted",
+          [classes.rootModerator]: voting_status === "Moderator",
         })}
         style={{ transform: `rotateY(${rotate}deg)` }}
       >
-        <div className={clsx(classes.content, classes.face)}>
-          <div
-            className={clsx(classes.innerContent)}
-            style={{
-              backgroundImage: faceCover ? `url(${faceCover})` : "none",
-              fontSize: `${fontSize}px`,
-            }}
-          >
-            {label}
+        <div className={classes.card}>
+          <div className={clsx(classes.content, classes.face)}>
+            <div
+              className={clsx(classes.innerContent)}
+              style={{
+                backgroundImage: faceCover ? `url(${faceCover})` : "none",
+                fontSize: `${fontSize}px`,
+              }}
+            >
+              {label}
+            </div>
           </div>
-        </div>
-        <div className={clsx(classes.content, classes.back)}>
-          <div
-            className={classes.innerContent}
-            style={backCover && { backgroundImage: `url(${backCover})` }}
-          ></div>
+          <div className={clsx(classes.content, classes.back)}>
+            <div
+              className={classes.innerContent}
+              style={backCover && { backgroundImage: `url(${backCover})` }}
+            ></div>
+          </div>
         </div>
       </button>
     </div>

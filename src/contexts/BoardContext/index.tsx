@@ -1,46 +1,54 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import LinearProgressBar from "monday-ui-react-core/dist/LinearProgressBar";
+import { createContext, useContext, useEffect } from "react";
 import { useMap } from "react-use";
+import { Actions } from "react-use/lib/useMap";
+import { RoundNumber } from "../../constants/cards";
 import { useConsole } from "../../hooks/useContextConsole";
-import { useMondayListenerEffect } from "../../hooks/useMondayListenerEffect";
-import { prepareNewlyCreatedBoard } from "../../services/createBoard";
+import { useLoadingPercent } from "../../hooks/useLoadingStatus";
+import { createGroup } from "../../services/createGroup";
+import { fetchBoardGroups } from "../../services/fetchBoardGroups";
+import { fetchGroupItemsAndValues } from "../../services/fetchBoardItemsAndValues";
 import { fetchUsers } from "../../services/fetchUsers";
-import { monday } from "../../services/monday";
-import { Player, StatusMap, User } from "../../services/types";
-import { useBoardId } from "../AppContext";
+import {
+  Board,
+  BoardGroup,
+  BoardItemWithValues,
+  StatusMap,
+  User,
+} from "../../services/types";
+import { normalizeById } from "../../utils/normalizers";
+import { useBoardInitialization } from "./useBoardInitialization";
 
-export const BoardContext = createContext<BoardState>(null);
+export const BoardContext = createContext<[BoardState, Actions<BoardState>]>(
+  null
+);
 type BoardState = {
+  boardId: Board["id"];
+  group?: BoardGroup; // current group
+  items: Record<string, BoardItemWithValues>;
+  round: RoundNumber;
   sessionStarted: boolean;
-  round: number;
-  players: Record<User["id"], Player>;
   allUsers: User[];
 };
 
-export const BoardProvider = ({ children, boardType }) => {
-  const [hasPrepared, setHasPrepared] = useState(
-    boardType === "planning_poker"
-  );
-  const [status, { set: setStatus }] = useMap<StatusMap>({
+export const BoardProvider = ({ children, boardType, boardId }) => {
+  const [statuses, { set: setStatus }] = useMap<StatusMap>({
+    items: "pending",
     allUsers: "pending",
+    group: "pending",
   });
-  const [map, { set }] = useMap<BoardState>({
-    sessionStarted: false,
+  const [boardState, boardActions] = useMap<BoardState>({
+    boardId,
+    items: {},
     round: 1,
-    players: {},
+    sessionStarted: false,
     allUsers: [],
   });
-  const boardId = useBoardId();
-  useConsole("BoardContext", status, map);
+  const { set } = boardActions;
 
-  useEffect(() => {
-    if (boardType === "readme" && !hasPrepared) {
-      prepareNewlyCreatedBoard(boardId).then((res) => {
-        setHasPrepared(true);
-      });
-    } else {
-      console.log("board has prepared", { boardType, hasPrepared });
-    }
-  }, [boardId, boardType, hasPrepared]);
+  useConsole("BoardContext", statuses, boardState);
+
+  useBoardInitialization({ boardType, boardId });
 
   useEffect(() => {
     fetchUsers()
@@ -51,8 +59,71 @@ export const BoardProvider = ({ children, boardType }) => {
       .catch((error) => {
         setStatus("allUsers", error);
       });
-  }, [set, setStatus]);
+  }, [setStatus, set]);
 
-  useMondayListenerEffect("events", console.log);
-  return <BoardContext.Provider value={map}>{children}</BoardContext.Provider>;
+  useEffect(() => {
+    fetchBoardGroups(boardId)
+      .then((groups) => {
+        if (groups.length === 0) {
+          createGroup(boardId, "My Task").then((group) => {
+            set("group", group);
+            setStatus("group", "fulfilled");
+          });
+        } else {
+          const [latestGroup] = groups;
+          set("group", latestGroup);
+          setStatus("group", "fulfilled");
+        }
+      })
+      .catch((error) => {
+        setStatus("group", error);
+      });
+  }, [boardId, setStatus, set]);
+
+  useEffect(() => {
+    if (boardState.group?.id) {
+      console.log(
+        "Fetching items for group",
+        boardState.group.id,
+        boardState.group.title
+      );
+      fetchGroupItemsAndValues(boardId, boardState.group.id)
+        .then((items) => {
+          console.log(items);
+          set("items", normalizeById(items));
+          setStatus("items", "fulfilled");
+        })
+        .catch((error) => {
+          setStatus("items", error);
+        });
+    }
+  }, [boardId, boardState.group?.id, boardState.group?.title, setStatus, set]);
+
+  const loadingPercent = useLoadingPercent(statuses);
+
+  if (Object.values(statuses).every((status) => status === "fulfilled")) {
+    return (
+      <BoardContext.Provider value={[boardState, boardActions]}>
+        {children}
+      </BoardContext.Provider>
+    );
+  }
+  return (
+    <LinearProgressBar
+      min={0}
+      max={100}
+      value={loadingPercent}
+      ariaLabel="Board is loading"
+    />
+  );
+};
+
+export const useModeratorItem = (): BoardItemWithValues | null => {
+  const [{ items }] = useContext(BoardContext);
+  console.log(items);
+  return (
+    Object.values(items).find(
+      (item) => item.values.voting_status.text === "Moderator"
+    ) ?? null
+  );
 };

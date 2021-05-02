@@ -1,5 +1,5 @@
 .root {
-  padding: var(--spacing-xl);
+  padding: var(--spacing-large);
 }
 
 .toolbar {
@@ -8,8 +8,22 @@
   justify-content: space-between;
 }
 
-.userCard {
+.cardBoard {
   position: relative;
+  margin-top: var(--spacing-large);
+}
+
+.userCard {
+  position: absolute;
+  /* margin-right: var(--spacing-large); */
+  transition: all 200ms;
+  filter: grayscale(1);
+}
+
+.userCardJoined {
+  opacity: 1;
+  left: 0;
+  filter: none;
 }
 
 .userCardAvatarWrapper {

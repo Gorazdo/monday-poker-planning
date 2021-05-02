@@ -1,6 +1,6 @@
 import classes from "./index.module.css";
 import Button from "monday-ui-react-core/dist/Button";
-import { useAsync, useAsyncFn } from "react-use";
+import { useAsyncFn } from "react-use";
 import {
   createBoard,
   addReadmeInfo,

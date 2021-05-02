@@ -1,0 +1,9 @@
+.inputWrapper {
+  display: flex;
+  align-items: stretch;
+}
+
+.input {
+  margin: 0;
+  margin-right: var(--spacing-small);
+}

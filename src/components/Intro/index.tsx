@@ -5,17 +5,11 @@ import classes from "./index.module.css";
 import { PopupContent } from "../../library/PopupContent";
 import { Typography } from "../../library/Typography";
 import { InlineTooltip } from "../../library/InlineTooltip";
-import { plural } from "../../hooks/usePlural";
-import {
-  CreateNewBoardButton,
-  StartFromDefaultBoardButton,
-} from "./ButtonSection";
+import { CreateNewBoardButton } from "./ButtonSection";
 import { fetchBoardSummary } from "../../services/fetchBoardSummary";
 import { useBoardId } from "../../contexts/AppContext";
 import { detectBoardType } from "../../utils/detectBoardType";
 import { Grid } from "../../library/Grid";
-import { BoardDebug } from "./BoardDebug";
-import { BoardProvider } from "../../contexts/BoardContext";
 import { PlayingBoard } from "../PlayingBoard";
 
 export const Intro = () => {
@@ -35,12 +29,7 @@ export const Intro = () => {
   }
   if (value) {
     const boardType = detectBoardType(value);
-    return (
-      <>
-        <BoardDebug boardSummaryData={value} boardType={boardType} />
-        <StrategySwitcher boardSummaryData={value} boardType={boardType} />
-      </>
-    );
+    return <StrategySwitcher boardSummaryData={value} boardType={boardType} />;
   }
   return (
     <AttentionBox
@@ -53,72 +42,72 @@ export const Intro = () => {
 
 const StrategySwitcher = ({ boardSummaryData, boardType }) => {
   const { name } = boardSummaryData;
-  if (boardType === "danger") {
-    return (
-      <div className={classes.popupWrapper}>
-        <PopupContent>
-          <Typography variant="h1" gutterBottom>
-            This <Board name={name} /> seems&nbsp;to&nbsp;be in&nbsp;use
-          </Typography>
-          <Typography variant="h3">How to use our app safely?</Typography>
-          <ol>
-            <li>Create a New Board (or click below)</li>
-            <li>Add our app on the New Board</li>
-            <li>Have fun!</li>
-          </ol>
-          <Grid variant="center">
-            <CreateNewBoardButton />
-          </Grid>
-        </PopupContent>
-      </div>
-    );
-  }
-  if (boardType === "default_template") {
-    return (
-      <div className={classes.popupWrapper}>
-        <PopupContent>
-          <Typography variant="h1" gutterBottom>
-            This <Board name={name} /> looks like created from scratch!
-          </Typography>
-          <AttentionBox
-            title={"All data will be cleared"}
-            text={`
-            Our plugin uses the whole board to keep data. All existing data (
-              ${plural("items", boardSummaryData.items)}, ${plural(
-              "groups",
-              boardSummaryData.groups
-            )} created by 
-              ${plural("creators", boardSummaryData.authors)}
-            ) will be cleared and overritten by Planning Poker App
-          `}
-          />
-          <Grid variant="center">
-            <StartFromDefaultBoardButton />
-          </Grid>
-        </PopupContent>
-      </div>
-    );
-  }
   if (boardType === "readme" || boardType === "planning_poker") {
     // User has run app after reading Readme group
     // We need to clean up readme stuff and populate board
     // and show real application
     return <PlayingBoard boardType={boardType} />;
   }
+  // if (boardType === "danger") {
   return (
     <div className={classes.popupWrapper}>
       <PopupContent>
         <Typography variant="h1" gutterBottom>
-          Board type is {boardType}
+          This <Board name={name} /> seems&nbsp;to&nbsp;be in&nbsp;use
         </Typography>
-        <AttentionBox
-          title="Ooops! Something is wrong"
-          text="Please, create a new Default Board, and then add the application to it again!"
-          type="danger"
-        />
+        <Typography variant="h3">How to use our app safely?</Typography>
+        <ol>
+          <li>Create a New Board (or click below)</li>
+          <li>Add our app on the New Board</li>
+          <li>Have fun!</li>
+        </ol>
+        <Grid variant="center">
+          <CreateNewBoardButton />
+        </Grid>
       </PopupContent>
     </div>
   );
+  // }
+  // if (boardType === "default_template") {
+  //   return (
+  //     <div className={classes.popupWrapper}>
+  //       <PopupContent>
+  //         <Typography variant="h1" gutterBottom>
+  //           This <Board name={name} /> looks like created from scratch!
+  //         </Typography>
+  //         <AttentionBox
+  //           title={"All data will be cleared"}
+  //           text={`
+  //           Our plugin uses the whole board to keep data. All existing data (
+  //             ${plural("items", boardSummaryData.items)}, ${plural(
+  //             "groups",
+  //             boardSummaryData.groups
+  //           )} created by
+  //             ${plural("creators", boardSummaryData.authors)}
+  //           ) will be cleared and overritten by Planning Poker App
+  //         `}
+  //         />
+  //         <Grid variant="center">
+  //           <StartFromDefaultBoardButton />
+  //         </Grid>
+  //       </PopupContent>
+  //     </div>
+  //   );
+  // }
+  // return (
+  //   <div className={classes.popupWrapper}>
+  //     <PopupContent>
+  //       <Typography variant="h1" gutterBottom>
+  //         Board type is {boardType}
+  //       </Typography>
+  //       <AttentionBox
+  //         title="Ooops! Something is wrong"
+  //         text="Please, create a new Default Board, and then add the application to it again!"
+  //         type="danger"
+  //       />
+  //     </PopupContent>
+  //   </div>
+  // );
 };
 
 const Board = ({ name }) => (

@@ -11,6 +11,7 @@ export const fetchBoardGroups = async (
           id 
           title 
           color 
+          position
         }
       }
     }

@@ -64,6 +64,7 @@ const createCommonColumns = async (createColumn) => {
   columns.push(
     await createColumn("Round 3", "numbers", STORY_POINTS_COLUMN_PROPS)
   );
+  columns.push(await createColumn("Voting Duration", "time_tracking"));
   columns.push(await createColumn("Session Duration", "time_tracking"));
   console.log("created columns", columns);
   return columns;
@@ -94,6 +95,8 @@ export const prepareNewlyCreatedBoard = async (boardId: Board["id"]) => {
   await createCommonColumns(createColumn);
   await createColumn("Player", "people");
   await createColumn("Session Started", "date");
+  await createColumn("Game Status", "text");
+  await createGroup(boardId, "My Task");
 };
 
 // Flow #1

@@ -1,5 +1,5 @@
 import { stringifyJsonForGql } from "../utils";
-import { monday } from "./monday";
+import { api } from "./monday";
 import { Board, BoardGroup, BoardItem } from "./types";
 
 export const createItemCreator = (
@@ -14,14 +14,21 @@ export const createItem = async (
   groupId: BoardGroup["id"],
   item_name: BoardItem["name"],
   column_values: any = {}
-) => {
-  await monday.api(`#graphql
+): Promise<BoardItem> => {
+  const response = await api(`#graphql
     mutation {
       create_item (board_id: ${boardId}, group_id: "${groupId}", item_name: "${item_name}", column_values: ${stringifyJsonForGql(
     column_values
   )}) {
         id
+        name
+        creator {
+          id
+          name
+        }
       }
     }
   `);
+
+  return response.data.create_item;
 };

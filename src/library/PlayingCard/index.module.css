@@ -73,7 +73,7 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  transition: 200ms background-color;
+  transition: 200ms all;
   border-radius: calc(var(--border-radius-big) * 0.75);
   padding: var(--spacing-small);
   display: grid;
@@ -99,6 +99,34 @@
 
 .back .innerContent {
   background-color: var(--color-very_light_gray);
+}
+
+.rootPale .innerContent {
+  opacity: 0.6;
+  filter: grayscale(0.2);
+}
+
+.card {
+  height: 100%;
+}
+
+.rootVoted .card {
+  animation: grow 100ms ease-in-out;
+  animation-direction: alternate;
+  animation-iteration-count: 2;
+}
+
+.rootModerator .innerContent {
+  opacity: 0;
+}
+
+@keyframes grow {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
 }
 
 .rootSelected .face .innerContent {

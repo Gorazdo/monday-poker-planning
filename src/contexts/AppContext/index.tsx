@@ -6,7 +6,6 @@ import { useLoadingPercent } from "../../hooks/useLoadingStatus";
 import { useMondayListenerEffect } from "../../hooks/useMondayListenerEffect";
 import { fetchBoardOwnerAccount } from "../../services/fetchBoardOwnerAccount";
 import { fetchMe } from "../../services/fetchMe";
-import { monday } from "../../services/monday";
 import { AccountInfo, StatusMap, User } from "../../services/types";
 
 export const AppContext = createContext<AppState>(null);
@@ -64,6 +63,7 @@ export const AppProvider = ({ children }) => {
   }, [set, setStatus, map.context?.boardId]);
 
   const contextCallback = useCallback((res) => {
+    console.log(res);
     setStatus("context", "fulfilled");
     if (res.data.boardId === undefined) {
       // dev mode
@@ -75,7 +75,9 @@ export const AppProvider = ({ children }) => {
       set("context", res.data);
     }
   }, []);
+
   const settingsCallback = useCallback((res) => {
+    console.log(res);
     setStatus("settings", "fulfilled");
     set("settings", res.data);
   }, []);

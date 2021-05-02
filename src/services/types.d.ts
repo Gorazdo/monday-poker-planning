@@ -1,4 +1,9 @@
-import { VOTING_STATUSES, VOTING_STATUS_COLUMN_PROPS } from "./createColumn";
+import { Vote } from "../constants/cards";
+import {
+  VotingStatusType,
+  VOTING_STATUSES,
+  VOTING_STATUS_COLUMN_PROPS,
+} from "./createColumn";
 
 export type BoardType =
   | "default_template" // a default newly created board
@@ -32,6 +37,27 @@ export type BoardItem = {
   };
 };
 
+export type BoardItemWithValues = BoardItem & {
+  values: Record<string, ItemValue>;
+};
+
+export type BoardItemWithValuesAndGroup = BoardItem & {
+  values: Record<string, ItemValue>;
+  group: Pick<BoardGroup, "id" | "title">;
+};
+
+export type ItemValue = {
+  id: string;
+  value: null | string | Record<string, any>;
+  additional_info: null | string | Record<string, any>;
+  text: string;
+  type: ColumnType;
+};
+
+export type BoardItemWithGroup = BoardItem & {
+  group: Pick<BoardGroup, "id" | "title">;
+};
+
 export type BoardKind = "public" | "private" | "share";
 
 export type BoardColumn = {
@@ -48,6 +74,7 @@ export type BoardGroup = {
   id: string;
   title: string;
   color: string;
+  position?: string;
 };
 
 export type BoardSummaryType = {
@@ -69,19 +96,23 @@ export type User = {
   photo_thumb: string;
 };
 
+export type GameStatus = "Round 1" | "Round 2" | "Round 3" | "Session ended";
+
 export type RowValues = {
-  voting_status: typeof VOTING_STATUSES[number];
+  voting_status: VotingStatusType;
   round_1: number;
   round_2: number;
   round_3: number;
-  player: number;
+  player: number | string;
+  vote: Vote;
+  game_status: GameStatus;
 };
 
 export type Player = {
-  voting_status: RowValues["voting_status"];
+  voting_status?: RowValues["voting_status"];
   name: User["name"];
   id: User["id"];
-  vote: Card["value"];
+  vote: null | Vote;
 };
 
 export type ColumnType =
@@ -117,3 +148,9 @@ export type ColumnType =
   | "integration";
 
 export type StatusMap = Record<string, "pending" | "fulfilled" | Error>;
+
+export type MondayEvent = {
+  type: "change_column_values" | string;
+  boardId: number;
+  itemIds: number[];
+};
