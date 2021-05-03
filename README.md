@@ -10,10 +10,11 @@ And we work only with empty or newly created boards.
 [x] Check board type
 [x] Automatically create a new board
 [x] Become a moderator
-[ ] First added to the board is moderator
-[ ] Moderator has it's own unique card board
+[x] First added to the board is moderator
+[x] Moderator has it's own unique card board
 [x] Non-numeric card values
-[ ] Round tracking
+[x] Round tracking
+[ ]
 
 ## Next Features
 

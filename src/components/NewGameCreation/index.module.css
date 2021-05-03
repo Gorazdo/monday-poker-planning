@@ -1,6 +1,7 @@
 .inputWrapper {
   display: flex;
   align-items: stretch;
+  max-width: 420px;
 }
 
 .input {

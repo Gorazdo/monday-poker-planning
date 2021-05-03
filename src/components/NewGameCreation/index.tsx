@@ -44,7 +44,7 @@ export const NewGameCreation = () => {
           onChange={(phrase) => {
             setState(phrase);
           }}
-          placeholder="Enter the subject of planning session"
+          placeholder="Please, enter the subject of planning session"
         />
         <Button loading={loading} onClick={startNewGameHandler}>
           Start New Game

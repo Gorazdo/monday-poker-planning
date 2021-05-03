@@ -17,6 +17,7 @@ import { useAsyncFn } from "react-use";
 import { NewGameCreation } from "../NewGameCreation";
 import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 import { GameSessionControls } from "../GameSessionControls";
+import { GameStatus } from "../../services/types";
 
 export const CardPickerPane = () => {
   const { cardsSequence } = useSettings();
@@ -29,15 +30,23 @@ export const CardPickerPane = () => {
   console.log("CardPickerPane", { moderatorItem, myItem });
 
   const [{ loading }, becomeModeratorFn] = useAsyncFn(async () => {
-    if (moderatorItem !== null) {
+    if (moderatorItem) {
+      // we mark current moderator as a player
       await updateRow(boardId, moderatorItem.id, {
         voting_status: "Joined",
       });
+
+      // we mark ourself as a moderator and copy value of previous moderator
+      await updateRow(boardId, myItem.id, {
+        voting_status: "Moderator",
+        game_status: moderatorItem.values.game_status.value as GameStatus,
+      });
+    } else {
+      // there was no moderator, so we simply mark ourself as one
+      await updateRow(boardId, myItem.id, {
+        voting_status: "Moderator",
+      });
     }
-    const result = await updateRow(boardId, myItem.id, {
-      voting_status: "Moderator",
-    });
-    console.log(result);
   }, [boardId, moderatorItem, myItem, boardActions.set]);
 
   const iAmModerator = useIAmModerator();
@@ -102,6 +111,12 @@ export const CardPickerPane = () => {
     if (iAmModerator) {
       return (
         <div>
+          <Typography variant="h3" gutterBottom>
+            Are you ready for a new game?{" "}
+            <span className={classes.label}>
+              <Label text="New round" />
+            </span>
+          </Typography>
           <NewGameCreation />
         </div>
       );

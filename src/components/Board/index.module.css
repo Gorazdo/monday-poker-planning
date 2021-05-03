@@ -18,13 +18,27 @@
   /* margin-right: var(--spacing-large); */
   transition: all 200ms;
   filter: grayscale(1);
+}
+
+.userCard::after {
+  position: absolute;
+  content: "";
+  border-radius: var(--border-radius-big);
+  background-color: var(--color-ui_grey);
   opacity: 0.5;
+  transition: opacity 100ms;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .userCardJoined {
-  opacity: 1;
-  left: 0;
   filter: none;
+}
+
+.userCardJoined::after {
+  opacity: 0;
 }
 
 .userCardAvatarWrapper {
@@ -36,6 +50,7 @@
   align-items: center;
   justify-content: center;
   margin-top: -24px;
+  z-index: 2;
 }
 
 .userCardAvatar {

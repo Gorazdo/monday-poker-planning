@@ -66,7 +66,6 @@ const InteractiveBoard = () => {
         .map((user, index) => {
           const joined = user.id in players;
           const vote = players[user.id]?.vote ?? null;
-          console.log(vote);
           return (
             <UserPlayingCard
               key={user.id}
