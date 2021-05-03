@@ -13,7 +13,6 @@ export const useBoardInitialization = ({ boardType, boardId, setStatus }) => {
   const [hasPrepared, setHasPrepared] = useState(
     boardType === "planning_poker"
   );
-  console.log(boardType, hasPrepared);
   useEffect(() => {
     if (hasPrepared) {
       setStatus("prepared", "fulfilled");

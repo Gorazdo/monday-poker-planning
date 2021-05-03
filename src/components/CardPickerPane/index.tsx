@@ -30,7 +30,6 @@ export const CardPickerPane = () => {
   const activePlayersCount = useSelector(selectActivePlayersCount);
   const moderatorId = useSelector(selectModeratorId);
   const moderatorItemId = useSelector(selectModeratorItemId);
-  console.log("CardPickerPane", { moderatorId, moderatorItemId });
 
   const iAmModerator = useSelector(selectIAmModerator);
 
@@ -142,6 +141,15 @@ export const CardPickerPane = () => {
           </span>
         </Typography>
         <NewGameCreation />
+      </div>
+    );
+  }
+  if (phase === "New Game") {
+    return (
+      <div>
+        <Typography variant="h3" className={classes.typography}>
+          A new game is starting
+        </Typography>
       </div>
     );
   }
