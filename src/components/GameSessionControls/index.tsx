@@ -85,18 +85,20 @@ export const GameSessionControls = () => {
 
   return (
     <Grid variant="row">
-      <Button
-        kind="secondary"
-        loading={endSessionState.loading}
-        onClick={endSessionHandler}
-      >
-        End Session
-      </Button>
       {phase.startsWith("Discussion") && round !== 3 && (
         <Button onClick={newRoundHandler}>New round</Button>
       )}
       {phase.startsWith("Round") && round !== 3 && (
         <Button onClick={revealCardsHandler}>Reveal Cards</Button>
+      )}
+      {phase.startsWith("Round") === false && (
+        <Button
+          kind="secondary"
+          loading={endSessionState.loading}
+          onClick={endSessionHandler}
+        >
+          End Session
+        </Button>
       )}
     </Grid>
   );

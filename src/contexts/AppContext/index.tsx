@@ -96,6 +96,7 @@ export const AppProvider = ({ children }) => {
   }
   return (
     <FullScreenLoader
+      statuses={statuses}
       label="Our dealer is almost here..."
       percent={loadingPercent}
     />

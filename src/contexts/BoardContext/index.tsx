@@ -112,7 +112,11 @@ export const BoardProvider = ({ children, boardType, boardId }) => {
     );
   }
   return (
-    <FullScreenLoader label="Shuffling the deck..." percent={loadingPercent} />
+    <FullScreenLoader
+      statuses={statuses}
+      label="Shuffling the deck..."
+      percent={loadingPercent}
+    />
   );
 };
 

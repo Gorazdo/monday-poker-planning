@@ -19,7 +19,13 @@ export const Intro = () => {
   }, [boardId]);
 
   if (loading && !value) {
-    return <FullScreenLoader label="Distributing the cards..." percent={100} />;
+    return (
+      <FullScreenLoader
+        statuses={{}}
+        label="Distributing the cards..."
+        percent={100}
+      />
+    );
   }
   if (value) {
     const boardType = detectBoardType(value);

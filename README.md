@@ -16,8 +16,17 @@ And we work only with empty or newly created boards.
 [x] Split view support
 [x] Accesibility support
 
-## Next Features
+### Minor improvements
 
+[x] Revert Tooltips Back
+[x] Add case when standalone or no board
+[ ] Tweak Card to choose
+[ ] Dark Theme
+[ ] Show selected card if refreshed
+[x] Hide End Session Button, Move to the right
+[x] Highlight The Lowest and Highest cards
+
+## Next Features
 [ ] Time tracking
 [ ] Task Board integration
 [ ] Work with Default Board Templates

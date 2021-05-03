@@ -15,5 +15,8 @@ export const fetchMe = async (): Promise<User> => {
         photo_thumb 
       } 
     }`);
+  if (!response) {
+    throw new Error("Can not reach monday.com");
+  }
   return response.data.me;
 };

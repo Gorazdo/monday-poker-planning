@@ -1,27 +1,11 @@
-import classes from "./index.module.css";
-import { Typography } from "../../library/Typography";
-import { PlayingCard } from "../../library/PlayingCard";
-import { useUsers } from "../../contexts/BoardContext/useUsers";
-import { Avatar } from "../../library/Avatar";
-import { CARD_BACKS, Vote } from "../../constants/cards";
-import { usePlayers } from "../../hooks/usePlayers";
 import clsx from "clsx";
 import { useMeasure } from "react-use";
-import { useContext } from "react";
-import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
-import { useSettings } from "../../contexts/AppContext/useSettings";
+import classes from "./index.module.css";
+import { useUsers } from "../../contexts/BoardContext/useUsers";
+import { usePlayers } from "../../hooks/usePlayers";
 import { Toolbar } from "../Toolbar";
 import { useViewMode } from "../../contexts/AppContext/useViewMode";
-
-const useCardBack = (
-  index: number,
-  voting_status
-): typeof CARD_BACKS[number] | "king" => {
-  if (voting_status === "Moderator") {
-    return "king";
-  }
-  return CARD_BACKS[index % CARD_BACKS.length];
-};
+import { UserPlayingCard, UserPlayingCardStub } from "./UserPlayingCard";
 
 export const Board = () => {
   const viewMode = useViewMode();
@@ -57,9 +41,10 @@ const InteractiveBoard = () => {
           sortkey: generateSortKey(user, players),
         }))
         .sort((a, b) => a.sortkey - b.sortkey)
-        .map((user, index) => {
+        .map((user, index, users) => {
           const joined = user.id in players;
           const vote = players[user.id]?.vote ?? null;
+          const minmax = getMinMax(users, players);
           return (
             <UserPlayingCard
               key={user.id}
@@ -68,7 +53,10 @@ const InteractiveBoard = () => {
               style={{
                 width: 120,
                 transform: joined
-                  ? `translateX(${(120 + 20) * index}px)`
+                  ? `translateX(${(120 + 20) * index}px ${getTransform(
+                      minmax,
+                      vote
+                    )})`
                   : `translateX(${width - 120 - index * 10}px)`,
               }}
               joined={joined}
@@ -80,70 +68,35 @@ const InteractiveBoard = () => {
   );
 };
 
-const UserPlayingCard = ({ user, joined, vote, voting_status, style }) => {
-  const cardBack = useCardBack(user.id + 3, voting_status);
-  const { variant, label, value } = usePlayingCardProps(vote, voting_status);
-  return (
-    <div
-      className={clsx(classes.userCard, {
-        [classes.userCardJoined]: joined,
-      })}
-      style={style}
-    >
-      <PlayingCard
-        value={value}
-        label={label}
-        variant={variant}
-        backCover={`/cards/${cardBack}.svg`}
-        voting_status={voting_status}
-        customAriaLabel={`${user.name} is ${voting_status ?? "off"}`}
-      />
-      <div
-        className={clsx(classes.userCardAvatarWrapper, {
-          [classes.userCardAvatarWrapperModerator]:
-            voting_status === "Moderator",
-        })}
-      >
-        <Avatar
-          url={user.photo_thumb}
-          name={user.name}
-          className={classes.userCardAvatar}
-        />
-      </div>
-    </div>
-  );
-};
+const getMinMax = (users, players): null | [number, number] => {
+  const votes = users
+    .map((user) => players[user.id]?.vote ?? null)
+    .filter((vote) => {
+      if (vote === null) {
+        return false;
+      }
+      return Number.isFinite(Number(vote));
+    });
 
-const usePlayingCardProps = (
-  vote: Vote | null,
-  voting_status
-): {
-  variant: "back" | "face";
-  label?: string;
-  value?: Vote;
-} => {
-  const { cardsMap } = useSettings();
-  if (vote === null || voting_status === "Moderator") {
-    return {
-      variant: "back",
-    };
+  if (votes.length < 2) {
+    return null;
   }
-
-  return {
-    ...cardsMap[vote],
-    variant: "face",
-  };
+  const min = Math.min(...votes);
+  const max = Math.max(...votes);
+  if (min === max) {
+    return null;
+  }
+  return [min, max];
 };
 
-const UserPlayingCardStub = () => {
-  return (
-    <div className={classes.userCard}>
-      <PlayingCard value={0} label="0" variant="back" />
-      <div className={classes.userCardAvatarWrapper}>
-        <Avatar url="" name="" className={classes.userCardAvatar} />
-      </div>
-    </div>
-  );
+const getTransform = (minmax: null | [number, number], vote): string => {
+  if (minmax === null || vote === null) {
+    return "";
+  }
+  if (minmax.includes(Number(vote))) {
+    return "translateY(-10px)";
+  }
+  return "";
 };
 
 const generateSortKey = (user, players) => {
