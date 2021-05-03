@@ -19,6 +19,7 @@ import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 import { GameSessionControls } from "../GameSessionControls";
 import { GameStatus } from "../../services/types";
 import { usePlayers } from "../../hooks/usePlayers";
+import { useViewMode } from "../../contexts/AppContext/useViewMode";
 
 export const CardPickerPane = () => {
   const { cardsSequence } = useSettings();
@@ -52,6 +53,7 @@ export const CardPickerPane = () => {
 
   const iAmModerator = useIAmModerator();
 
+  const viewMode = useViewMode();
   const phase = usePhase(moderatorItem);
   useEffect(() => {
     setSelected(null);
@@ -103,12 +105,14 @@ export const CardPickerPane = () => {
     }
     return (
       <div>
-        <Typography variant="h3" gutterBottom>
-          Choose your card{" "}
-          <span className={classes.label}>
-            <Label text="Voting phase" />
-          </span>
-        </Typography>
+        {viewMode !== "split" && (
+          <Typography variant="h3" gutterBottom>
+            Choose your card{" "}
+            <span className={classes.label}>
+              <Label text="Voting phase" />
+            </span>
+          </Typography>
+        )}
         <Grid variant="cardsPicker">
           {cardsSequence.map((item) => (
             <PickCard

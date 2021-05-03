@@ -10,6 +10,8 @@ import { useMeasure } from "react-use";
 import { useContext } from "react";
 import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
 import { useSettings } from "../../contexts/AppContext/useSettings";
+import { Toolbar } from "../Toolbar";
+import { useViewMode } from "../../contexts/AppContext/useViewMode";
 
 const useCardBack = (
   index: number,
@@ -22,22 +24,14 @@ const useCardBack = (
 };
 
 export const Board = () => {
-  const [{ group }] = useContext(BoardContext);
-
-  const moderatorItem = useModeratorItem();
-
+  const viewMode = useViewMode();
   return (
-    <section className={classes.root}>
-      <div className={classes.toolbar}>
-        <div>
-          <Typography variant="h2">
-            {!group ? "Loading..." : group.title}
-          </Typography>
-          <Typography variant="p" gutterBottom>
-            {moderatorItem?.values?.game_status?.text}
-          </Typography>
-        </div>
-      </div>
+    <section
+      className={clsx(classes.root, {
+        [classes.rootSplit]: viewMode === "split",
+      })}
+    >
+      {viewMode === "fullScreen" && <Toolbar />}
       <InteractiveBoard />
     </section>
   );

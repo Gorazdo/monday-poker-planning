@@ -6,6 +6,8 @@ import { BoardProvider } from "../../contexts/BoardContext";
 import { useBoardId } from "../../contexts/AppContext";
 import { GameProvider } from "../../contexts/GameContext";
 import classes from "./index.module.css";
+import { useViewMode } from "../../contexts/AppContext/useViewMode";
+import { Toolbar } from "../Toolbar";
 
 export const PlayingBoard = ({ boardType }) => {
   const boardId = useBoardId();
@@ -18,13 +20,14 @@ export const PlayingBoard = ({ boardType }) => {
 };
 
 const Wrapper = () => {
-  const handleClick = () => {};
+  const viewMode = useViewMode();
   return (
     <GameProvider>
       <StickyLayout
         topSlot={<Board />}
         bottomSlot={
           <div className={classes.root}>
+            {viewMode === "split" && <Toolbar />}
             <CardPickerPane />
             <Button
               kind="secondary"

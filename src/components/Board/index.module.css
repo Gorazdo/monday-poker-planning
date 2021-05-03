@@ -2,10 +2,9 @@
   padding: var(--spacing-large);
 }
 
-.toolbar {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+.rootSplit {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .cardBoard {

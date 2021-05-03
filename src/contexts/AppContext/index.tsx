@@ -8,10 +8,16 @@ import { fetchBoardOwnerAccount } from "../../services/fetchBoardOwnerAccount";
 import { fetchMe } from "../../services/fetchMe";
 import { AccountInfo, StatusMap, User } from "../../services/types";
 
+type ViewSettings = {
+  sequence: "Scrum" | "Fibonacci";
+};
+
+export type ViewMode = "fullScreen" | "split";
+
 export const AppContext = createContext<AppState>(null);
 type AppState = {
   account?: AccountInfo;
-  settings?: any;
+  settings?: ViewSettings;
   me?: User;
   context?: {
     boardIds: number[];
@@ -24,7 +30,7 @@ type AppState = {
       isGuest: boolean;
       isViewOnly: boolean;
     };
-    viewMode: "fullscreen" | "splited";
+    viewMode: ViewMode;
   };
 };
 // const DEV_BOARD_ID = "1249871037";

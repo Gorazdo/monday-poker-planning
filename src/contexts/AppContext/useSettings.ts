@@ -9,7 +9,7 @@ type Settings = {
 
 const SEQUENCE_SETTING_MAP = {
   Scrum: SCRUM,
-  Fibonacchi: FIBONACCHI,
+  Fibonacci: FIBONACCHI,
 };
 
 const useSequence = (setting?: string) => {
@@ -24,8 +24,8 @@ const useSequence = (setting?: string) => {
 };
 
 export const useSettings = (): Settings => {
-  const settings = useContext(AppContext);
-  const cardsSequence = useSequence();
+  const { settings } = useContext(AppContext);
+  const cardsSequence = useSequence(settings?.sequence);
   return {
     cardsSequence,
     cardsMap: cardsSequence.reduce((acc, card) => {
