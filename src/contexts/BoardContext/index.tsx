@@ -33,6 +33,7 @@ type BoardState = {
 
 export const BoardProvider = ({ children, boardType, boardId }) => {
   const [statuses, { set: setStatus }] = useMap<StatusMap>({
+    prepared: "pending",
     items: "pending",
     allUsers: "pending",
     group: "pending",
@@ -48,7 +49,7 @@ export const BoardProvider = ({ children, boardType, boardId }) => {
 
   useConsole("BoardContext", statuses, boardState);
 
-  useBoardInitialization({ boardType, boardId });
+  useBoardInitialization({ boardType, boardId, setStatus });
 
   useEffect(() => {
     fetchUsers()
@@ -62,23 +63,25 @@ export const BoardProvider = ({ children, boardType, boardId }) => {
   }, [setStatus, set]);
 
   useEffect(() => {
-    fetchBoardGroups(boardId)
-      .then((groups) => {
-        if (groups.length === 0) {
-          createGroup(boardId, "My Task").then((group) => {
-            set("group", group);
+    if (statuses.prepared === "fulfilled") {
+      fetchBoardGroups(boardId)
+        .then((groups) => {
+          if (groups.length === 0) {
+            createGroup(boardId, "My Task").then((group) => {
+              set("group", group);
+              setStatus("group", "fulfilled");
+            });
+          } else {
+            const [latestGroup] = groups;
+            set("group", latestGroup);
             setStatus("group", "fulfilled");
-          });
-        } else {
-          const [latestGroup] = groups;
-          set("group", latestGroup);
-          setStatus("group", "fulfilled");
-        }
-      })
-      .catch((error) => {
-        setStatus("group", error);
-      });
-  }, [boardId, setStatus, set]);
+          }
+        })
+        .catch((error) => {
+          setStatus("group", error);
+        });
+    }
+  }, [boardId, statuses.prepared, setStatus, set]);
 
   useEffect(() => {
     if (boardState.group?.id) {
@@ -117,7 +120,7 @@ export const useModeratorItem = (): BoardItemWithValues | null => {
   const [{ items }] = useContext(BoardContext);
   return (
     Object.values(items).find(
-      (item) => item.values.voting_status.text === "Moderator"
+      (item) => item.values.voting_status?.text === "Moderator"
     ) ?? null
   );
 };

@@ -3,6 +3,8 @@ import {
   createColumnCreator,
   VOTING_STATUS_COLUMN_PROPS,
   STORY_POINTS_COLUMN_PROPS,
+  VOTING_DURATION_COLUMN_PROPS,
+  SESSION_DURATION_COLUMN_PROPS,
 } from "./createColumn";
 import { createGroup } from "./createGroup";
 import { createItemCreator } from "./createItem";
@@ -64,8 +66,20 @@ const createCommonColumns = async (createColumn) => {
   columns.push(
     await createColumn("Round 3", "numbers", STORY_POINTS_COLUMN_PROPS)
   );
-  columns.push(await createColumn("Voting Duration", "time_tracking"));
-  columns.push(await createColumn("Session Duration", "time_tracking"));
+  columns.push(
+    await createColumn(
+      "Voting Duration",
+      "numbers",
+      VOTING_DURATION_COLUMN_PROPS
+    )
+  );
+  columns.push(
+    await createColumn(
+      "Session Duration",
+      "numbers",
+      SESSION_DURATION_COLUMN_PROPS
+    )
+  );
   console.log("created columns", columns);
   return columns;
 };

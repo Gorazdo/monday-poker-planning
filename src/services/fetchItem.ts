@@ -11,6 +11,7 @@ export const fetchItem = async (
     {
       boards(ids: ${boardId}) {
         items(ids: ${itemId}) {
+          id
           creator {
             id
             name

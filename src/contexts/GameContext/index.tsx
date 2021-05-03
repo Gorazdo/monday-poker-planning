@@ -18,8 +18,6 @@ export const GameProvider = ({ children }) => {
   const groupId = group.id;
   useJoinMeEffect();
 
-  console.log("GameContext", boardId, groupId);
-
   const eventListener = useCallback(
     (event) => {
       const { data } = event;
@@ -101,14 +99,15 @@ export const GameProvider = ({ children }) => {
 };
 
 const useJoinMeEffect = () => {
-  const [{ boardId, group, items }, boardActions] = useContext(BoardContext);
+  const [{ boardId, items, group }, boardActions] = useContext(BoardContext);
   const me = useMe();
-  const groupId = group.id;
   const myItem = useMyItem();
+  const groupId = group.id;
   useDeepCompareEffect(() => {
+    console.log(groupId);
     if (myItem === undefined) {
       console.log(me, "is going to be joined");
-      joinGame({ boardId, groupId, user: me }).then(({ item, isModerator }) => {
+      joinGame({ boardId, user: me, groupId }).then(({ item, isModerator }) => {
         console.log("Joined item is", item, isModerator);
         const newItems = {
           ...items,

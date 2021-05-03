@@ -27,8 +27,8 @@ export const detectBoardType = ({
     return "empty";
   }
   if (
-    name.endsWith(PP_BOARD_NAME) &&
-    groups[0].title === PP_README_GROUP_NAME
+    groups[0] === undefined ||
+    (name.endsWith(PP_BOARD_NAME) && groups[0]?.title === PP_README_GROUP_NAME)
   ) {
     return "readme";
   }

@@ -51,7 +51,7 @@ const StrategySwitcher = ({ boardSummaryData, boardType }) => {
         <Typography variant="h1" gutterBottom className={classes.title}>
           This <Board name={name} /> seems <br /> to&nbsp;be in&nbsp;use
         </Typography>
-        <Typography variant="h3">How to use our app safely?</Typography>
+        <Typography variant="h3">How to use our app?</Typography>
         <ol>
           <li>Create a New Board (or click below)</li>
           <li>Add our app on the New Board</li>

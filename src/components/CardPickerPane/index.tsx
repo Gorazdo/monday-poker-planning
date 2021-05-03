@@ -18,13 +18,14 @@ import { NewGameCreation } from "../NewGameCreation";
 import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 import { GameSessionControls } from "../GameSessionControls";
 import { GameStatus } from "../../services/types";
+import { usePlayers } from "../../hooks/usePlayers";
 
 export const CardPickerPane = () => {
   const { cardsSequence } = useSettings();
   const boardId = useBoardId();
   const myItem = useMyItem();
   const [selected, setSelected] = useState<Card["value"]>(null);
-
+  const players = usePlayers();
   const [, boardActions] = useContext(BoardContext);
   const moderatorItem = useModeratorItem();
   console.log("CardPickerPane", { moderatorItem, myItem });
@@ -73,6 +74,21 @@ export const CardPickerPane = () => {
   }
   if (phase.startsWith("Round")) {
     if (iAmModerator) {
+      if (Object.values(players).length === 1) {
+        return (
+          <div>
+            <Typography variant="h3" gutterBottom>
+              Waiting for others{" "}
+              <span className={classes.label}>
+                <Label text="Invite them" />
+              </span>
+            </Typography>
+            <Typography variant="h5">
+              Tip: Share the URL of this page with your teammates
+            </Typography>
+          </div>
+        );
+      }
       return (
         <div>
           <Typography variant="h3" gutterBottom>
