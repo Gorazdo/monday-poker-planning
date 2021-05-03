@@ -22,7 +22,7 @@ export const useBoardInitialization = ({ boardType, boardId, setStatus }) => {
   useEffect(() => {
     if (hasPrepared) {
       fetchColumns(boardId).then((columns) => {
-        if (columns.length < 11) {
+        if (columns.length < 9) {
           console.error("Planning Poker App: Missing columns");
           console.log(columns);
           const normalizedColumns = normalizeById(columns);

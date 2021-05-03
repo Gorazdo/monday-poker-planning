@@ -2,7 +2,11 @@ import Button from "monday-ui-react-core/dist/Button";
 import { useContext } from "react";
 import { useAsyncFn } from "react-use";
 import { useBoardId } from "../../contexts/AppContext";
-import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
+import {
+  BoardContext,
+  useModeratorItem,
+  useRefetchFn,
+} from "../../contexts/BoardContext";
 import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 
 import { Grid } from "../../library/Grid";
@@ -12,12 +16,15 @@ import { updateRow } from "../../services/updateRow";
 export const GameSessionControls = () => {
   const boardId = useBoardId();
   const [{ items }] = useContext(BoardContext);
+  const refetchFn = useRefetchFn();
 
   const moderatorItem = useModeratorItem();
   const phase = usePhase(moderatorItem);
 
   const round = useRound();
   const [endSessionState, endSessionHandler] = useAsyncFn(async () => {
+    // refetchFn();
+
     await updateRow(boardId, moderatorItem.id, {
       game_status: "Session ended",
     });
@@ -49,6 +56,7 @@ export const GameSessionControls = () => {
         })
       )
     );
+    // refetchFn();
   }, [items, boardId, moderatorItem?.id]);
 
   const [, newRoundHandler] = useAsyncFn(async () => {
@@ -72,6 +80,7 @@ export const GameSessionControls = () => {
         game_status: "Round 3",
       });
     }
+    // refetchFn();
   }, [items, boardId, moderatorItem?.id]);
 
   return (

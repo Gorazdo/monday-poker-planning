@@ -16,65 +16,6 @@ const generateBoardName = () => {
   return getRandomEmojie() + " " + PP_BOARD_NAME;
 };
 
-export const ButtonSection = ({ severity }) => {
-  const currentBoardId = useBoardId();
-  const [createdBoard, createNewBoard] = useAsyncFn(async () => {
-    const board = await createBoard(generateBoardName());
-    await addReadmeInfo(board.id);
-    return board;
-  });
-
-  const [preparedBoard, prepareCurrentBoard] = useAsyncFn(async () => {
-    await prepareDefaultTemplateBoard(currentBoardId);
-    return;
-  });
-
-  // console.log(value, window);
-  return (
-    <div className={classes.buttons}>
-      {severity === "success" ? (
-        <Button
-          loading={preparedBoard.loading}
-          size="large"
-          onClick={() => {
-            if (preparedBoard.loading) {
-              return;
-            }
-            prepareCurrentBoard();
-          }}
-        >
-          Start!
-        </Button>
-      ) : (
-        <>
-          <Button
-            loading={createdBoard.loading}
-            onClick={() => {
-              if (createdBoard.loading) {
-                return;
-              }
-              if (createdBoard.value) {
-                const boardUrl = makeBoardUrl(createdBoard.value);
-                window.open(boardUrl, "tab");
-              } else {
-                createNewBoard();
-              }
-            }}
-          >
-            {createdBoard.value ? "Go to The Board" : "Create a New Board"}
-            {createdBoard.value && (
-              <MoveArrowRight className={classes.buttonRightIcon} />
-            )}
-          </Button>
-          <Button kind="tertiary" size="small" disabled>
-            Use Current Board <i>&nbsp;(soon)</i>
-          </Button>
-        </>
-      )}
-    </div>
-  );
-};
-
 export const StartFromDefaultBoardButton = () => {
   const currentBoardId = useBoardId();
   const [{ value, loading }, prepareCurrentBoard] = useAsyncFn(async () => {

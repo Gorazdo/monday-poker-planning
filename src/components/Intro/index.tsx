@@ -1,5 +1,4 @@
 import AttentionBox from "monday-ui-react-core/dist/AttentionBox";
-import Loader from "monday-ui-react-core/dist/Loader";
 import { useAsync } from "react-use";
 import classes from "./index.module.css";
 import { PopupContent } from "../../library/PopupContent";

@@ -66,13 +66,13 @@ const createCommonColumns = async (createColumn) => {
   columns.push(
     await createColumn("Round 3", "numbers", STORY_POINTS_COLUMN_PROPS)
   );
-  columns.push(
-    await createColumn(
-      "Voting Duration",
-      "numbers",
-      VOTING_DURATION_COLUMN_PROPS
-    )
-  );
+  // columns.push(
+  //   await createColumn(
+  //     "Voting Duration",
+  //     "numbers",
+  //     VOTING_DURATION_COLUMN_PROPS
+  //   )
+  // );
   columns.push(
     await createColumn(
       "Session Duration",
@@ -101,16 +101,17 @@ export const addReadmeInfo = async (boardId: Board["id"]) => {
   await createReadmeItem("Now, let's add the app to this board");
   await createReadmeItem("1. Press [+ Add View] Button above");
   await createReadmeItem("2. Select 'Apps' and find Planning Poker");
+
+  const createColumn = createColumnCreator(boardId);
+  await createColumn("Player", "people");
+  await createCommonColumns(createColumn);
+  await createColumn("Session Started", "date");
+  await createColumn("Game Status", "text");
 };
 
 export const prepareNewlyCreatedBoard = async (boardId: Board["id"]) => {
   await clearGroups(boardId);
-  const createColumn = createColumnCreator(boardId);
-  await createCommonColumns(createColumn);
-  await createColumn("Player", "people");
-  await createColumn("Session Started", "date");
-  await createColumn("Game Status", "text");
-  await createGroup(boardId, "My Task");
+  await createGroup(boardId, "My First Task");
 };
 
 // Flow #1

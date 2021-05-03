@@ -22,17 +22,17 @@ export const createColumnCreator = (boardId: Board["id"]) => async (
 };
 
 export const STORY_POINTS_COLUMN_PROPS = {
-  function: "sum",
+  function: "median",
   unit: { symbol: "custom", custom_unit: " SP", direction: "right" },
 } as const;
 
 export const VOTING_DURATION_COLUMN_PROPS = {
-  function: "median",
+  function: "sum",
   unit: { symbol: "custom", custom_unit: " s", direction: "right" },
 } as const;
 
 export const SESSION_DURATION_COLUMN_PROPS = {
-  function: "median",
+  function: "sum",
   unit: { symbol: "custom", custom_unit: " m", direction: "right" },
 } as const;
 

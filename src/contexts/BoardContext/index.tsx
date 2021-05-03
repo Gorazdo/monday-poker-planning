@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect } from "react";
-import { useMap } from "react-use";
+import { createContext, useCallback, useContext, useEffect } from "react";
+import { useAsyncFn, useMap } from "react-use";
 import { Actions } from "react-use/lib/useMap";
 import { RoundNumber } from "../../constants/cards";
 import { useConsole } from "../../hooks/useContextConsole";
@@ -123,4 +123,19 @@ export const useModeratorItem = (): BoardItemWithValues | null => {
       (item) => item.values.voting_status?.text === "Moderator"
     ) ?? null
   );
+};
+
+export const useRefetchFn = () => {
+  const [{ boardId, group }, boardActions] = useContext(BoardContext);
+  const [status, refetchFn] = useAsyncFn(async () => {
+    if (!group) {
+      return;
+    }
+    await fetchGroupItemsAndValues(boardId, group.id).then((items) => {
+      console.log("Refetched items", items);
+      boardActions.set("items", normalizeById(items));
+    });
+  }, [boardId, group?.id]);
+
+  return refetchFn;
 };
