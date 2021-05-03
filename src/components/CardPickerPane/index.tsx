@@ -16,6 +16,7 @@ import { useIAmModerator, useMyItem } from "../../contexts/GameContext";
 import { useAsyncFn } from "react-use";
 import { NewGameCreation } from "../NewGameCreation";
 import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
+import { GameSessionControls } from "../GameSessionControls";
 
 export const CardPickerPane = () => {
   const { cardsSequence } = useSettings();
@@ -57,6 +58,7 @@ export const CardPickerPane = () => {
             <Label text="Discussion phase" />
           </span>
         </Typography>
+        {iAmModerator && <GameSessionControls />}
       </div>
     );
   }
@@ -70,6 +72,7 @@ export const CardPickerPane = () => {
               <Label text="Voting phase" />
             </span>
           </Typography>
+          <GameSessionControls />
         </div>
       );
     }

@@ -18,6 +18,7 @@
   /* margin-right: var(--spacing-large); */
   transition: all 200ms;
   filter: grayscale(1);
+  opacity: 0.5;
 }
 
 .userCardJoined {

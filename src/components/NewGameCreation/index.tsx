@@ -29,7 +29,7 @@ export const NewGameCreation = () => {
     console.log(row);
   }, [boardId, myItem.id, state, setBoardContext]);
   return (
-    <Grid variant="center">
+    <Grid>
       <div className={classes.inputWrapper}>
         <EditableInput
           value={state}

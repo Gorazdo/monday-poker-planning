@@ -14,7 +14,6 @@
 
 .cardsPicker {
   display: grid;
-  padding-top: var(--spacing-large);
   grid-gap: var(--spacing-large);
   grid-template-columns: repeat(
     auto-fill,

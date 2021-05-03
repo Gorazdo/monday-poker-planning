@@ -26,7 +26,12 @@ const Wrapper = () => {
         bottomSlot={
           <div className={classes.root}>
             <CardPickerPane />
-            <Button kind="tertiary" onClick={() => window.location.reload()}>
+            <Button
+              kind="secondary"
+              size="small"
+              className={classes.manualButton}
+              onClick={() => window.location.reload()}
+            >
               Manual Refresh
             </Button>
           </div>

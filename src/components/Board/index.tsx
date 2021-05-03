@@ -1,22 +1,15 @@
-import Button from "monday-ui-react-core/dist/Button";
 import classes from "./index.module.css";
 import { Typography } from "../../library/Typography";
-import { Grid } from "../../library/Grid";
 import { PlayingCard } from "../../library/PlayingCard";
 import { useUsers } from "../../contexts/BoardContext/useUsers";
 import { Avatar } from "../../library/Avatar";
 import { CARD_BACKS, Vote } from "../../constants/cards";
-import { useBoardId } from "../../contexts/AppContext";
 import { usePlayers } from "../../hooks/usePlayers";
 import clsx from "clsx";
-import { useAsyncFn, useMeasure } from "react-use";
-import { revealCard } from "../../services/game/revealCard";
-import { useContext, useState } from "react";
+import { useMeasure } from "react-use";
+import { useContext } from "react";
 import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
-import { useIAmModerator } from "../../contexts/GameContext";
-import { updateRow } from "../../services/updateRow";
 import { useSettings } from "../../contexts/AppContext/useSettings";
-import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 
 const useCardBack = (
   index: number,
@@ -29,74 +22,9 @@ const useCardBack = (
 };
 
 export const Board = () => {
-  const boardId = useBoardId();
-  const [{ group, items }] = useContext(BoardContext);
+  const [{ group }] = useContext(BoardContext);
 
   const moderatorItem = useModeratorItem();
-  const phase = usePhase(moderatorItem);
-
-  const round = useRound();
-  const [endSessionState, endSessionHandler] = useAsyncFn(async () => {
-    await updateRow(boardId, moderatorItem.id, {
-      game_status: "Session ended",
-    });
-  }, [boardId, moderatorItem?.id]);
-
-  const [revealed, setRevealed] = useState(false);
-
-  const [, revealCardsHandler] = useAsyncFn(async () => {
-    if (round === 1) {
-      await updateRow(boardId, moderatorItem.id, {
-        game_status: "Discussion 1",
-      });
-    }
-    if (round === 2) {
-      await updateRow(boardId, moderatorItem.id, {
-        game_status: "Discussion 2",
-      });
-    }
-    if (round === 3) {
-      await updateRow(boardId, moderatorItem.id, {
-        game_status: "Discussion 3",
-      });
-    }
-
-    await Promise.all(
-      Object.values(items).map((item) =>
-        revealCard(round, {
-          boardId,
-          itemId: item.id,
-          userId: item.creator.id,
-        })
-      )
-    );
-    setRevealed(true);
-  }, [items, boardId, moderatorItem?.id]);
-
-  const [, newRoundHandler] = useAsyncFn(async () => {
-    await Promise.all(
-      Object.values(items)
-        .filter((item) => item.id !== moderatorItem.id)
-        .map((item) =>
-          updateRow(boardId, item.id, {
-            voting_status: "Voting",
-          })
-        )
-    );
-
-    if (round === 1) {
-      await updateRow(boardId, moderatorItem.id, {
-        game_status: "Round 2",
-      });
-    }
-    if (round === 2) {
-      await updateRow(boardId, moderatorItem.id, {
-        game_status: "Round 3",
-      });
-    }
-  }, [items, boardId, moderatorItem?.id]);
-
-  const iAmModerator = useIAmModerator();
 
   return (
     <section className={classes.root}>
@@ -109,23 +37,6 @@ export const Board = () => {
             {moderatorItem?.values?.game_status?.text}
           </Typography>
         </div>
-        {iAmModerator && phase !== "Session ended" && (
-          <Grid variant="row">
-            <Button
-              kind="secondary"
-              loading={endSessionState.loading}
-              onClick={endSessionHandler}
-            >
-              End Session
-            </Button>
-            {phase.startsWith("Discussion") && round !== 3 && (
-              <Button onClick={newRoundHandler}>New round</Button>
-            )}
-            {phase.startsWith("Round") && round !== 3 && (
-              <Button onClick={revealCardsHandler}>Reveal Cards</Button>
-            )}
-          </Grid>
-        )}
       </div>
       <InteractiveBoard />
     </section>

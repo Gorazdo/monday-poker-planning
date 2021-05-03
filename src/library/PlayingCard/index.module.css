@@ -85,10 +85,6 @@
   background-color: var(--color-highlight);
 }
 
-.face:hover {
-  transform: rotateY(185deg);
-}
-
 .face:active {
   transform: rotateY(190deg);
 }
@@ -128,10 +124,6 @@
 .rootSelected .face .innerContent {
   background-color: var(--primary-color);
   color: var(--color-snow_white);
-}
-
-.back:hover {
-  transform: rotateY(5deg);
 }
 
 .back:active {

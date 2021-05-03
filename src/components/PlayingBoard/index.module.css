@@ -1,5 +1,12 @@
 .root {
   background-color: var(--color-ui_grey);
   padding: var(--spacing-large);
+  min-height: 160px;
   position: relative;
+}
+
+.manualButton {
+  position: absolute;
+  right: var(--spacing-large);
+  bottom: var(--spacing-large);
 }
