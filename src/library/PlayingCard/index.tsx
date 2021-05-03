@@ -57,8 +57,8 @@ export const PlayingCard: React.FC<PlayingCardProps> = ({
           [classes.rootFaceUp]: variant === "face",
           [classes.rootFaceDown]: variant === "back",
           [classes.rootSelected]: selected,
-          [classes.rootPale]: voting_status === "Joined",
-          [classes.rootPale]: voting_status === "Voting",
+          [classes.rootPale]:
+            voting_status === "Joined" || voting_status === "Voting",
           [classes.rootVoted]: voting_status === "Voted",
           [classes.rootModerator]: voting_status === "Moderator",
         })}
