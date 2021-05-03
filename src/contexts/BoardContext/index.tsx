@@ -33,7 +33,6 @@ export const BoardContext = createContext<[BoardState, Actions<BoardState>]>(
 type BoardState = {
   boardId: Board["id"];
   group?: BoardGroup; // current group
-  items: Record<string, BoardItemWithValues>;
   round: RoundNumber;
   sessionStarted: boolean;
 };
@@ -43,12 +42,10 @@ export const BoardProvider = ({ children, boardType }) => {
   const dispatch = useAppDispatch();
   const [statuses, { set: setStatus }] = useMap<StatusMap>({
     prepared: "pending",
-    items: "pending",
     group: "pending",
   });
   const [boardState, boardActions] = useMap<BoardState>({
     boardId,
-    items: {},
     round: 1,
     sessionStarted: false,
   });
@@ -87,25 +84,6 @@ export const BoardProvider = ({ children, boardType }) => {
         });
     }
   }, [boardId, statuses.prepared, setStatus, set]);
-
-  useEffect(() => {
-    if (boardState.group?.id) {
-      console.log(
-        "Fetching items for group",
-        boardState.group.id,
-        boardState.group.title
-      );
-      fetchGroupItemsAndValues(boardId, boardState.group.id)
-        .then((items) => {
-          console.log(items);
-          set("items", normalizeById(items));
-          setStatus("items", "fulfilled");
-        })
-        .catch((error) => {
-          setStatus("items", error);
-        });
-    }
-  }, [boardId, boardState.group?.id, boardState.group?.title, setStatus, set]);
 
   const loadingPercent = useLoadingPercent(statuses);
 

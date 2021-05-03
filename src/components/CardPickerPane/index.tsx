@@ -7,11 +7,10 @@ import { Grid } from "../../library/Grid";
 import { useEffect, useState } from "react";
 import { Card } from "../../constants/cards";
 import { pickCard } from "../../services/game/pickCard";
-import { useMySpace } from "../../contexts/BoardContext/useMySpace";
 import { NewGameCreation } from "../NewGameCreation";
 import { GameSessionControls } from "../GameSessionControls";
 import { useSelector } from "react-redux";
-import { selectViewMode } from "../../state/contextSlice";
+import { selectBoardId, selectViewMode } from "../../state/contextSlice";
 import { useCardsSequence } from "../../hooks/useCardsSequence";
 import {
   selectBoardStatus,
@@ -21,7 +20,9 @@ import {
   selectActivePlayersCount,
   selectRound,
   selectIAmModerator,
+  selectMyItemId,
 } from "../../state/boardSlice";
+import { selectMe } from "../../state/meSlice";
 
 export const CardPickerPane = () => {
   const { cardsSequence } = useCardsSequence();
@@ -148,7 +149,9 @@ export const CardPickerPane = () => {
 };
 
 const PickCard = ({ item, selected, setSelected }) => {
-  const { boardId, userId, itemId } = useMySpace();
+  const myItemId = useSelector(selectMyItemId);
+  const boardId = useSelector(selectBoardId);
+  const me = useSelector(selectMe);
   const round = useSelector(selectRound);
   return (
     <div key={item.value} style={{ minWidth: 80 }}>
@@ -160,8 +163,8 @@ const PickCard = ({ item, selected, setSelected }) => {
           setSelected(value);
           pickCard(round, value, {
             boardId,
-            userId,
-            itemId,
+            userId: me.id,
+            itemId: myItemId,
           }).catch((error) => {
             // error case we unselect
             setSelected(null);

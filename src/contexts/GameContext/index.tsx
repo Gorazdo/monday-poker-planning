@@ -4,10 +4,7 @@ import { useDeepCompareEffect } from "react-use";
 import { useMondayListenerEffect } from "../../hooks/useMondayListenerEffect";
 import { useReoccuringDispatch } from "../../hooks/useReoccuringFetch";
 import { fetchBoardGroups } from "../../services/fetchBoardGroups";
-import { fetchBoardItemsWithValues } from "../../services/fetchBoardItems";
-import { fetchGroupItemsAndValues } from "../../services/fetchBoardItemsAndValues";
 import { joinGame } from "../../services/game/joinGame";
-import { BoardItemWithValues } from "../../services/types";
 import {
   fetchCurrentItemsThunk,
   selectGroupId,
@@ -17,13 +14,13 @@ import {
 import { selectBoardId } from "../../state/contextSlice";
 import { selectMe } from "../../state/meSlice";
 import { useAppDispatch } from "../../state/store";
-import { normalizeById } from "../../utils/normalizers";
 import { BoardContext } from "../BoardContext";
 
 export const GameContext = createContext<[]>([]);
 
 export const GameProvider = ({ children }) => {
-  const [{ boardId, group, items }, boardActions] = useContext(BoardContext);
+  const boardId = useSelector(selectBoardId);
+  const [{ group }, boardActions] = useContext(BoardContext);
 
   const groupId = group.id;
   useJoinMeEffect();
@@ -39,36 +36,12 @@ export const GameProvider = ({ children }) => {
         return;
       }
       if (data.type === "new_items") {
-        fetchBoardItemsWithValues(boardId, data.itemIds).then((newItems) => {
-          // in case of item in different group was created
-          const thisGroupItems = newItems.filter(
-            (item) => item.group.id === groupId
-          );
-          // add new items to the store
-          boardActions.set("items", {
-            ...items,
-            ...normalizeById(thisGroupItems),
-          });
-          console.log({ items, thisGroupItems, groupId });
-        });
         // double check to load everything
-        fetchGroupItemsAndValues(boardId, groupId).then((updatedItems) => {
-          // update items in the store
-          boardActions.set("items", {
-            ...items,
-            ...normalizeById(updatedItems),
-          });
-        });
+        // update items in the store
       }
       if (data.type === "change_column_values") {
         if (data.columnId.startsWith("round_")) {
-          fetchGroupItemsAndValues(boardId, groupId).then((updatedItems) => {
-            // update items in the store
-            boardActions.set("items", {
-              ...items,
-              ...normalizeById(updatedItems),
-            });
-          });
+          // update items in the store
         }
 
         if (data.columnId === "game_status") {
@@ -86,13 +59,7 @@ export const GameProvider = ({ children }) => {
             data.columnValue.startsWith("Round") ||
             data.columnValue === "Session ended"
           ) {
-            fetchGroupItemsAndValues(boardId, groupId).then((updatedItems) => {
-              // update items in the store
-              boardActions.set("items", {
-                ...items,
-                ...normalizeById(updatedItems),
-              });
-            });
+            // update items in the store
           }
         }
         if (data.columnId === "voting_status") {
@@ -100,17 +67,11 @@ export const GameProvider = ({ children }) => {
             // we do not trigger on this "Temp" value
             return; //
           }
-          fetchGroupItemsAndValues(boardId, groupId).then((updatedItems) => {
-            // update items in the store
-            boardActions.set("items", {
-              ...items,
-              ...normalizeById(updatedItems),
-            });
-          });
+          // update items in the store
         }
       }
     },
-    [dispatch, boardId, groupId, JSON.stringify(items)]
+    [dispatch, boardId, groupId]
   );
 
   useMondayListenerEffect("events", eventListener);
