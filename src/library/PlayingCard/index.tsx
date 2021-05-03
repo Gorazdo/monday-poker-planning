@@ -10,6 +10,7 @@ export interface PlayingCardProps extends Card {
   fontSize?: number;
   variant: "face" | "back";
   selected?: boolean;
+  customAriaLabel?: string;
   voting_status?: VotingStatusType;
   onChange?: (value: Card["value"], variant: "face" | "back") => void;
 }
@@ -21,10 +22,17 @@ const useAriaLabel = (variant, value) => {
   return `It's a ${value} card, faced up`;
 };
 
-const useButtonAriaLabel = (variant, value) => {
-  if (variant === "face") {
-    return "Select card";
+const useButtonAriaLabel = (variant, value, label, customAriaLabel) => {
+  if (customAriaLabel) {
+    return customAriaLabel;
   }
+  if (variant === "face") {
+    if (Number.isFinite(value)) {
+      return `Select card: ${value} SP`;
+    }
+    return `Select card: "${label}"`;
+  }
+
   return "Reveal card";
 };
 
@@ -37,6 +45,7 @@ export const PlayingCard: React.FC<PlayingCardProps> = ({
   fontSize = 32,
   variant,
   selected,
+  customAriaLabel,
   onChange,
 }) => {
   const rotate = variant === "face" ? 180 : 0;
@@ -52,7 +61,7 @@ export const PlayingCard: React.FC<PlayingCardProps> = ({
     >
       <button
         onClick={handleClick}
-        aria-label={useButtonAriaLabel(variant, value)}
+        aria-label={useButtonAriaLabel(variant, value, label, customAriaLabel)}
         className={clsx(classes.root, classes.aspectRatioInner, {
           [classes.rootFaceUp]: variant === "face",
           [classes.rootFaceDown]: variant === "back",

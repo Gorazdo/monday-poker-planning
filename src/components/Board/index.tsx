@@ -96,6 +96,7 @@ const UserPlayingCard = ({ user, joined, vote, voting_status, style }) => {
         variant={variant}
         backCover={`/cards/${cardBack}.svg`}
         voting_status={voting_status}
+        customAriaLabel={`${user.name} is ${voting_status ?? "off"}`}
       />
       <div
         className={clsx(classes.userCardAvatarWrapper, {

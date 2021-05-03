@@ -13,6 +13,8 @@ And we work only with empty or newly created boards.
 [x] Non-numeric card values
 [x] Round tracking
 [x] Settings
+[x] Split view support
+[x] Accesibility support
 
 ## Next Features
 
