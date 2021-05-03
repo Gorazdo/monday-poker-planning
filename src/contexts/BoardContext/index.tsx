@@ -17,7 +17,13 @@ import {
   StatusMap,
   User,
 } from "../../services/types";
+import {
+  boardSlice,
+  fetchCurrentItemsThunk,
+  selectGroupId,
+} from "../../state/boardSlice";
 import { selectBoardId } from "../../state/contextSlice";
+import { useAppDispatch } from "../../state/store";
 import { normalizeById } from "../../utils/normalizers";
 import { useBoardInitialization } from "./useBoardInitialization";
 
@@ -34,6 +40,7 @@ type BoardState = {
 
 export const BoardProvider = ({ children, boardType }) => {
   const boardId = useSelector(selectBoardId);
+  const dispatch = useAppDispatch();
   const [statuses, { set: setStatus }] = useMap<StatusMap>({
     prepared: "pending",
     items: "pending",
@@ -46,6 +53,13 @@ export const BoardProvider = ({ children, boardType }) => {
     sessionStarted: false,
   });
   const { set } = boardActions;
+  const groupId = useSelector(selectGroupId);
+
+  useEffect(() => {
+    if (groupId) {
+      dispatch(fetchCurrentItemsThunk({ boardId, groupId }));
+    }
+  }, [groupId, boardId]);
 
   useConsole("BoardContext", statuses, boardState);
 
@@ -58,11 +72,13 @@ export const BoardProvider = ({ children, boardType }) => {
           if (groups.length === 0) {
             createGroup(boardId, "My Task").then((group) => {
               set("group", group);
+              dispatch(boardSlice.actions.setGroup(group));
               setStatus("group", "fulfilled");
             });
           } else {
             const [latestGroup] = groups;
             set("group", latestGroup);
+            dispatch(boardSlice.actions.setGroup(latestGroup));
             setStatus("group", "fulfilled");
           }
         })
@@ -106,14 +122,5 @@ export const BoardProvider = ({ children, boardType }) => {
       label="Shuffling the deck..."
       percent={loadingPercent}
     />
-  );
-};
-
-export const useModeratorItem = (): BoardItemWithValues | null => {
-  const [{ items }] = useContext(BoardContext);
-  return (
-    Object.values(items).find(
-      (item) => item.values.voting_status?.text === "Moderator"
-    ) ?? null
   );
 };

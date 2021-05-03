@@ -49,3 +49,5 @@ const userSelectors = usersAdapter.getSelectors();
 export const selectUsers = createSelector(sliceSelector, (slice) => {
   return userSelectors.selectAll(slice);
 });
+
+export const selectUserById = userSelectors.selectById;

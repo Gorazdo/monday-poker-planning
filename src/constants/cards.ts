@@ -7,7 +7,7 @@ export const EXTRA_CARDS: Card[] = [
   { value: "coffee-break", label: "I need some Coffee", fontSize: 18 },
 ];
 
-export type Vote = number | "infinity" | "coffee-break" | "what";
+export type Vote = null | number | "infinity" | "coffee-break" | "what";
 
 export type Card = {
   value: Vote;

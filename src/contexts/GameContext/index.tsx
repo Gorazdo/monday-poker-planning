@@ -2,14 +2,23 @@ import { createContext, useCallback, useContext } from "react";
 import { shallowEqual, useSelector } from "react-redux";
 import { useDeepCompareEffect } from "react-use";
 import { useMondayListenerEffect } from "../../hooks/useMondayListenerEffect";
+import { useReoccuringDispatch } from "../../hooks/useReoccuringFetch";
 import { fetchBoardGroups } from "../../services/fetchBoardGroups";
 import { fetchBoardItemsWithValues } from "../../services/fetchBoardItems";
 import { fetchGroupItemsAndValues } from "../../services/fetchBoardItemsAndValues";
 import { joinGame } from "../../services/game/joinGame";
 import { BoardItemWithValues } from "../../services/types";
+import {
+  fetchCurrentItemsThunk,
+  selectGroupId,
+  selectModeratorItemId,
+  selectMyItemId,
+} from "../../state/boardSlice";
+import { selectBoardId } from "../../state/contextSlice";
 import { selectMe } from "../../state/meSlice";
+import { useAppDispatch } from "../../state/store";
 import { normalizeById } from "../../utils/normalizers";
-import { BoardContext, useModeratorItem } from "../BoardContext";
+import { BoardContext } from "../BoardContext";
 
 export const GameContext = createContext<[]>([]);
 
@@ -18,9 +27,11 @@ export const GameProvider = ({ children }) => {
 
   const groupId = group.id;
   useJoinMeEffect();
-
+  useReoccuringDispatch(fetchCurrentItemsThunk({ boardId, groupId }));
+  const dispatch = useAppDispatch();
   const eventListener = useCallback(
     (event) => {
+      dispatch(fetchCurrentItemsThunk({ boardId, groupId }));
       const { data } = event;
       console.log(data.type, data);
       if (data.boardId !== boardId) {
@@ -99,7 +110,7 @@ export const GameProvider = ({ children }) => {
         }
       }
     },
-    [boardId, groupId, JSON.stringify(items)]
+    [dispatch, boardId, groupId, JSON.stringify(items)]
   );
 
   useMondayListenerEffect("events", eventListener);
@@ -108,45 +119,21 @@ export const GameProvider = ({ children }) => {
 };
 
 const useJoinMeEffect = () => {
-  const [{ boardId, items, group }, boardActions] = useContext(BoardContext);
+  const boardId = useSelector(selectBoardId);
+  const groupId = useSelector(selectGroupId);
   const me = useSelector(selectMe, shallowEqual);
-  const myItem = useMyItem();
-  const moderatorItem = useModeratorItem();
-  const groupId = group.id;
+  const myItemId = useSelector(selectMyItemId);
+  const moderatorItemId = useSelector(selectModeratorItemId);
+  const dispatch = useAppDispatch();
   useDeepCompareEffect(() => {
     console.log(groupId);
-    if (myItem === undefined) {
+    if (myItemId === undefined) {
       console.log(me, "is going to be joined");
-      joinGame({ boardId, user: me, groupId }).then(({ item, isModerator }) => {
-        console.log("Joined item is", item, isModerator);
-        const newItems = {
-          ...items,
-          [item.id]: item,
-        };
-        console.log("join", { items, newItems });
-        boardActions.set("items", newItems);
+      joinGame({ boardId, user: me, groupId }).then(() => {
+        dispatch(fetchCurrentItemsThunk({ boardId, groupId }));
       });
     } else {
       console.log(me, "Has been joined");
     }
-  }, [myItem, moderatorItem?.id, me, groupId, boardId]);
-};
-
-export const useMyItem = (): BoardItemWithValues | undefined => {
-  const [{ items }] = useContext(BoardContext);
-  const me = useSelector(selectMe, shallowEqual);
-  try {
-    const myItem = Object.values(items).find(
-      (item) => item.creator.id === me.id
-    );
-    return myItem;
-  } catch {
-    return undefined;
-  }
-};
-
-export const useIAmModerator = () => {
-  const myItem = useMyItem();
-  const moderatorItem = useModeratorItem();
-  return myItem && moderatorItem && myItem.id === moderatorItem.id;
+  }, [myItemId, moderatorItemId, me, groupId, boardId]);
 };

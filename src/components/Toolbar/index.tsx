@@ -1,11 +1,12 @@
 import classes from "./index.module.css";
 import { Typography } from "../../library/Typography";
-import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
+import { BoardContext } from "../../contexts/BoardContext";
 import { useContext } from "react";
 import { useSelector } from "react-redux";
 import { selectViewMode } from "../../state/contextSlice";
+import { selectGameStatus } from "../../state/boardSlice";
 export const Toolbar = () => {
-  const moderatorItem = useModeratorItem();
+  const gameStatus = useSelector(selectGameStatus);
   const [{ group }] = useContext(BoardContext);
   const viewMode = useSelector(selectViewMode);
   return (
@@ -15,7 +16,7 @@ export const Toolbar = () => {
           {!group ? "Loading..." : group.title}
         </Typography>
         <Typography variant="p" gutterBottom>
-          {moderatorItem?.values?.game_status?.text}
+          {gameStatus}
         </Typography>
       </div>
     </div>

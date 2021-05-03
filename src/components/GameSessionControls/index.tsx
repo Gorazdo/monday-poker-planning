@@ -1,83 +1,85 @@
 import Button from "monday-ui-react-core/dist/Button";
-import { useContext } from "react";
 import { useSelector } from "react-redux";
 import { useAsyncFn } from "react-use";
-import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
-import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 
 import { Grid } from "../../library/Grid";
 import { revealCard } from "../../services/game/revealCard";
 import { updateRow } from "../../services/updateRow";
+import {
+  selectActivePlayers,
+  selectGameStatus,
+  selectModeratorItemId,
+  selectRound,
+  selectVotingPlayers,
+} from "../../state/boardSlice";
 import { selectBoardId } from "../../state/contextSlice";
 
 export const GameSessionControls = () => {
   const boardId = useSelector(selectBoardId);
-  const [{ items }] = useContext(BoardContext);
+  const players = useSelector(selectActivePlayers);
+  const voters = useSelector(selectVotingPlayers);
 
-  const moderatorItem = useModeratorItem();
-  const phase = usePhase(moderatorItem);
+  const moderatorItemId = useSelector(selectModeratorItemId);
+  const phase = useSelector(selectGameStatus);
+  const round = useSelector(selectRound);
 
-  const round = useRound();
   const [endSessionState, endSessionHandler] = useAsyncFn(async () => {
     // refetchFn();
 
-    await updateRow(boardId, moderatorItem.id, {
+    await updateRow(boardId, moderatorItemId, {
       game_status: "Session ended",
     });
-  }, [boardId, moderatorItem?.id]);
+  }, [boardId, moderatorItemId]);
 
   const [, revealCardsHandler] = useAsyncFn(async () => {
     if (round === 1) {
-      await updateRow(boardId, moderatorItem.id, {
+      await updateRow(boardId, moderatorItemId, {
         game_status: "Discussion 1",
       });
     }
     if (round === 2) {
-      await updateRow(boardId, moderatorItem.id, {
+      await updateRow(boardId, moderatorItemId, {
         game_status: "Discussion 2",
       });
     }
     if (round === 3) {
-      await updateRow(boardId, moderatorItem.id, {
+      await updateRow(boardId, moderatorItemId, {
         game_status: "Discussion 3",
       });
     }
 
     await Promise.all(
-      Object.values(items).map((item) =>
+      players.map((player) =>
         revealCard(round, {
           boardId,
-          itemId: item.id,
-          userId: item.creator.id,
+          itemId: player.itemId,
+          userId: player.id,
         })
       )
     );
-    // refetchFn();
-  }, [items, boardId, moderatorItem?.id]);
+  }, [players, boardId, moderatorItemId]);
 
   const [, newRoundHandler] = useAsyncFn(async () => {
     await Promise.all(
-      Object.values(items)
-        .filter((item) => item.id !== moderatorItem.id)
-        .map((item) =>
-          updateRow(boardId, item.id, {
-            voting_status: "Voting",
-          })
-        )
+      voters.map((player) =>
+        updateRow(boardId, player.itemId, {
+          voting_status: "Voting",
+        })
+      )
     );
 
     if (round === 1) {
-      await updateRow(boardId, moderatorItem.id, {
+      await updateRow(boardId, moderatorItemId, {
         game_status: "Round 2",
       });
     }
     if (round === 2) {
-      await updateRow(boardId, moderatorItem.id, {
+      await updateRow(boardId, moderatorItemId, {
         game_status: "Round 3",
       });
     }
     // refetchFn();
-  }, [items, boardId, moderatorItem?.id]);
+  }, [voters, boardId, moderatorItemId]);
 
   return (
     <Grid variant="row">

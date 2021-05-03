@@ -4,16 +4,23 @@ import { Avatar } from "../../library/Avatar";
 import { CARD_BACKS, Vote } from "../../constants/cards";
 import clsx from "clsx";
 import { useCardsSequence } from "../../hooks/useCardsSequence";
+import { useSelector } from "react-redux";
+import { selectUserById } from "../../state/usersSlice";
+import { RootState } from "../../state/store";
+import { selectGameStatus } from "../../state/boardSlice";
 
 export const UserPlayingCard = ({
-  user,
+  userId,
   joined,
   vote,
   voting_status,
-  phase,
   style,
 }) => {
-  const cardBack = useCardBack(user.id, voting_status);
+  const gameStatus = useSelector(selectGameStatus);
+  const user = useSelector((state: RootState) =>
+    selectUserById(state.users, userId)
+  );
+  const cardBack = useCardBack(userId, voting_status);
   const { variant, label, value } = usePlayingCardProps(vote, voting_status);
   return (
     <div
@@ -25,10 +32,10 @@ export const UserPlayingCard = ({
       <PlayingCard
         value={value}
         label={label}
-        variant={phase === "Session ended" ? "back" : variant}
+        variant={gameStatus === "Session ended" ? "back" : variant}
         backCover={`/cards/${cardBack}.svg`}
         voting_status={voting_status}
-        customAriaLabel={`${user.name} is ${voting_status ?? "off"}`}
+        customAriaLabel={`${user?.name} is ${voting_status ?? "off"}`}
       />
       <div
         className={clsx(classes.userCardAvatarWrapper, {
@@ -37,8 +44,8 @@ export const UserPlayingCard = ({
         })}
       >
         <Avatar
-          url={user.photo_thumb}
-          name={user.name}
+          url={user?.photo_thumb}
+          name={user?.name}
           className={classes.userCardAvatar}
         />
       </div>

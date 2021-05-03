@@ -4,62 +4,46 @@ import AttentionBox from "monday-ui-react-core/dist/AttentionBox";
 import { PlayingCard } from "../../library/PlayingCard";
 import { Typography } from "../../library/Typography";
 import { Grid } from "../../library/Grid";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "../../constants/cards";
 import { pickCard } from "../../services/game/pickCard";
 import { useMySpace } from "../../contexts/BoardContext/useMySpace";
-import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
-import { updateRow } from "../../services/updateRow";
-import { useIAmModerator, useMyItem } from "../../contexts/GameContext";
-import { useAsyncFn } from "react-use";
 import { NewGameCreation } from "../NewGameCreation";
-import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 import { GameSessionControls } from "../GameSessionControls";
-import { GameStatus } from "../../services/types";
-import { usePlayers } from "../../hooks/usePlayers";
 import { useSelector } from "react-redux";
-import { selectBoardId, selectViewMode } from "../../state/contextSlice";
+import { selectViewMode } from "../../state/contextSlice";
 import { useCardsSequence } from "../../hooks/useCardsSequence";
+import {
+  selectBoardStatus,
+  selectGameStatus,
+  selectModeratorId,
+  selectModeratorItemId,
+  selectActivePlayersCount,
+  selectRound,
+  selectIAmModerator,
+} from "../../state/boardSlice";
 
 export const CardPickerPane = () => {
   const { cardsSequence } = useCardsSequence();
-  const boardId = useSelector(selectBoardId);
-  const myItem = useMyItem();
   const [selected, setSelected] = useState<Card["value"]>(null);
-  const players = usePlayers();
-  const [, boardActions] = useContext(BoardContext);
-  const moderatorItem = useModeratorItem();
-  console.log("CardPickerPane", { moderatorItem, myItem });
+  const activePlayersCount = useSelector(selectActivePlayersCount);
+  const moderatorId = useSelector(selectModeratorId);
+  const moderatorItemId = useSelector(selectModeratorItemId);
+  console.log("CardPickerPane", { moderatorId, moderatorItemId });
 
-  const [{ loading }, becomeModeratorFn] = useAsyncFn(async () => {
-    if (moderatorItem) {
-      // we mark current moderator as a player
-      await updateRow(boardId, moderatorItem.id, {
-        voting_status: "Joined",
-      });
-
-      // we mark ourself as a moderator and copy value of previous moderator
-      await updateRow(boardId, myItem.id, {
-        voting_status: "Moderator",
-        game_status: moderatorItem.values.game_status.value as GameStatus,
-      });
-    } else {
-      // there was no moderator, so we simply mark ourself as one
-      await updateRow(boardId, myItem.id, {
-        voting_status: "Moderator",
-      });
-    }
-  }, [boardId, moderatorItem, myItem, boardActions.set]);
-
-  const iAmModerator = useIAmModerator();
+  const iAmModerator = useSelector(selectIAmModerator);
 
   const viewMode = useSelector(selectViewMode);
-  const phase = usePhase(moderatorItem);
+  const phase = useSelector(selectGameStatus);
+  const boardStatus = useSelector(selectBoardStatus);
 
   useEffect(() => {
     setSelected(null);
   }, [phase]);
 
+  if (boardStatus === "pending") {
+    return null;
+  }
   if (phase === null) {
     return (
       <AttentionBox
@@ -83,7 +67,7 @@ export const CardPickerPane = () => {
   }
   if (phase.startsWith("Round")) {
     if (iAmModerator) {
-      if (Object.values(players).length === 1) {
+      if (activePlayersCount < 2) {
         return (
           <div>
             <Typography variant="h3" className={classes.typography}>
@@ -165,7 +149,7 @@ export const CardPickerPane = () => {
 
 const PickCard = ({ item, selected, setSelected }) => {
   const { boardId, userId, itemId } = useMySpace();
-  const round = useRound();
+  const round = useSelector(selectRound);
   return (
     <div key={item.value} style={{ minWidth: 80 }}>
       <PlayingCard
