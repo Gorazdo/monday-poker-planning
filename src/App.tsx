@@ -1,14 +1,44 @@
+import { useCallback, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Intro } from "./components/Intro";
-import { AppProvider } from "./contexts/AppContext";
-import { ThemeProvider } from "./contexts/Theme";
+import { useLoadingPercent } from "./hooks/useLoadingStatus";
+import { useMondayListenerEffect } from "./hooks/useMondayListenerEffect";
+import { FullScreenLoader } from "./library/FullScreenLoader";
+import { contextSlice } from "./state/contextSlice";
+import { fetchMeThunk } from "./state/meSlice";
+import { selectAppReady, selectAppStatus } from "./state/selectors";
+import { settingsSlice } from "./state/settingsSlice";
+import { useDispatch } from "./state/store";
 
 function App() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchMeThunk());
+  }, []);
+
+  const contextCallback = useCallback((response) => {
+    dispatch(contextSlice.actions.setContext(response.data));
+  }, []);
+
+  const settingsCallback = useCallback((response) => {
+    dispatch(settingsSlice.actions.setSettings(response.data));
+  }, []);
+
+  useMondayListenerEffect("context", contextCallback);
+  useMondayListenerEffect("settings", settingsCallback);
+  const statuses = useSelector(selectAppStatus);
+
+  const loadingPercent = useLoadingPercent(statuses);
+  const isFulfilled = useSelector(selectAppReady);
+  if (isFulfilled) {
+    return <Intro />;
+  }
   return (
-    <ThemeProvider>
-      <AppProvider>
-        <Intro />
-      </AppProvider>
-    </ThemeProvider>
+    <FullScreenLoader
+      statuses={statuses}
+      label="Our dealer is almost here..."
+      percent={loadingPercent}
+    />
   );
 }
 

@@ -8,10 +8,10 @@ export const InlineTooltip = ({
   ...rest
 }) => {
   return (
-    <Tooltip content={content} {...TooltipProps}>
-      <span {...rest} className={classes.tooltiped}>
-        {children}
-      </span>
-    </Tooltip>
+    // <Tooltip content={content} {...TooltipProps}>
+    <span {...rest} className={classes.tooltiped}>
+      {children}
+    </span>
+    // </Tooltip>
   );
 };

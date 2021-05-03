@@ -9,19 +9,20 @@ import {
 import MoveArrowRight from "monday-ui-react-core/dist/icons/MoveArrowRight";
 import { getRandomEmojie } from "../../utils/getRandomEmojie";
 import { makeBoardUrl } from "../../utils/makeBoardUrl";
-import { useBoardId } from "../../contexts/AppContext";
 import { PP_BOARD_NAME } from "../../constants/boards";
+import { useSelector } from "react-redux";
+import { selectBoardId } from "../../state/contextSlice";
 
 const generateBoardName = () => {
   return getRandomEmojie() + " " + PP_BOARD_NAME;
 };
 
 export const StartFromDefaultBoardButton = () => {
-  const currentBoardId = useBoardId();
+  const boardId = useSelector(selectBoardId);
   const [{ value, loading }, prepareCurrentBoard] = useAsyncFn(async () => {
-    await prepareDefaultTemplateBoard(currentBoardId);
+    await prepareDefaultTemplateBoard(boardId);
     return;
-  }, [currentBoardId]);
+  }, [boardId]);
 
   return (
     <Button

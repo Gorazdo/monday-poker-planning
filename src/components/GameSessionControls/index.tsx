@@ -1,16 +1,17 @@
 import Button from "monday-ui-react-core/dist/Button";
 import { useContext } from "react";
+import { useSelector } from "react-redux";
 import { useAsyncFn } from "react-use";
-import { useBoardId } from "../../contexts/AppContext";
 import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
 import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 
 import { Grid } from "../../library/Grid";
 import { revealCard } from "../../services/game/revealCard";
 import { updateRow } from "../../services/updateRow";
+import { selectBoardId } from "../../state/contextSlice";
 
 export const GameSessionControls = () => {
-  const boardId = useBoardId();
+  const boardId = useSelector(selectBoardId);
   const [{ items }] = useContext(BoardContext);
 
   const moderatorItem = useModeratorItem();

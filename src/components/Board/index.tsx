@@ -4,14 +4,15 @@ import classes from "./index.module.css";
 import { useUsers } from "../../contexts/BoardContext/useUsers";
 import { usePlayers } from "../../hooks/usePlayers";
 import { Toolbar } from "../Toolbar";
-import { useViewMode } from "../../contexts/AppContext/useViewMode";
 import { UserPlayingCard, UserPlayingCardStub } from "./UserPlayingCard";
 import { useModeratorItem } from "../../contexts/BoardContext";
 import { usePhase } from "../../contexts/BoardContext/useRound";
 import { extractVote } from "../../services/game/revealCard";
+import { useSelector } from "react-redux";
+import { selectViewMode } from "../../state/contextSlice";
 
 export const Board = () => {
-  const viewMode = useViewMode();
+  const viewMode = useSelector(selectViewMode);
   return (
     <section
       className={clsx(classes.root, {

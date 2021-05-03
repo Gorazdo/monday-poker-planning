@@ -6,7 +6,7 @@ import classes from "./index.module.css";
 
 export const FullScreenLoader = ({ label, statuses, percent }) => {
   const error = Object.values(statuses).find(
-    (status) => status instanceof Error
+    (status) => status instanceof Error || typeof status === "object"
   ) as Error | undefined;
   if (error) {
     return (

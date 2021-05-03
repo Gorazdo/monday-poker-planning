@@ -3,24 +3,22 @@ import { Board } from "../Board";
 import { CardPickerPane } from "../CardPickerPane";
 import { StickyLayout } from "../../library/StickyLayout";
 import { BoardProvider } from "../../contexts/BoardContext";
-import { useBoardId } from "../../contexts/AppContext";
 import { GameProvider } from "../../contexts/GameContext";
 import classes from "./index.module.css";
-import { useViewMode } from "../../contexts/AppContext/useViewMode";
 import { Toolbar } from "../Toolbar";
+import { useSelector } from "react-redux";
+import { selectViewMode } from "../../state/contextSlice";
 
 export const PlayingBoard = ({ boardType }) => {
-  const boardId = useBoardId();
-
   return (
-    <BoardProvider boardType={boardType} boardId={boardId}>
+    <BoardProvider boardType={boardType}>
       <Wrapper />
     </BoardProvider>
   );
 };
 
 const Wrapper = () => {
-  const viewMode = useViewMode();
+  const viewMode = useSelector(selectViewMode);
   return (
     <GameProvider>
       <StickyLayout

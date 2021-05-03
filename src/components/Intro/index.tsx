@@ -6,14 +6,15 @@ import { Typography } from "../../library/Typography";
 import { InlineTooltip } from "../../library/InlineTooltip";
 import { CreateNewBoardButton } from "./ButtonSection";
 import { fetchBoardSummary } from "../../services/fetchBoardSummary";
-import { useBoardId } from "../../contexts/AppContext";
 import { detectBoardType } from "../../utils/detectBoardType";
 import { Grid } from "../../library/Grid";
 import { PlayingBoard } from "../PlayingBoard";
 import { FullScreenLoader } from "../../library/FullScreenLoader";
+import { useSelector } from "react-redux";
+import { selectBoardId } from "../../state/contextSlice";
 
 export const Intro = () => {
-  const boardId = useBoardId();
+  const boardId = useSelector(selectBoardId);
   const { value, loading, error } = useAsync(async () => {
     return await fetchBoardSummary(boardId);
   }, [boardId]);

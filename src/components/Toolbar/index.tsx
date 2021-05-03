@@ -2,11 +2,12 @@ import classes from "./index.module.css";
 import { Typography } from "../../library/Typography";
 import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
 import { useContext } from "react";
-import { useViewMode } from "../../contexts/AppContext/useViewMode";
+import { useSelector } from "react-redux";
+import { selectViewMode } from "../../state/contextSlice";
 export const Toolbar = () => {
   const moderatorItem = useModeratorItem();
   const [{ group }] = useContext(BoardContext);
-  const viewMode = useViewMode();
+  const viewMode = useSelector(selectViewMode);
   return (
     <div className={classes.toolbar}>
       <div className={viewMode === "split" && classes.split}>

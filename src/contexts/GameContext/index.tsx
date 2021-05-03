@@ -1,13 +1,14 @@
 import { createContext, useCallback, useContext } from "react";
+import { shallowEqual, useSelector } from "react-redux";
 import { useDeepCompareEffect } from "react-use";
 import { useMondayListenerEffect } from "../../hooks/useMondayListenerEffect";
 import { fetchBoardGroups } from "../../services/fetchBoardGroups";
 import { fetchBoardItemsWithValues } from "../../services/fetchBoardItems";
 import { fetchGroupItemsAndValues } from "../../services/fetchBoardItemsAndValues";
 import { joinGame } from "../../services/game/joinGame";
-import { BoardItem, BoardItemWithValues } from "../../services/types";
+import { BoardItemWithValues } from "../../services/types";
+import { selectMe } from "../../state/meSlice";
 import { normalizeById } from "../../utils/normalizers";
-import { useMe } from "../AppContext";
 import { BoardContext, useModeratorItem } from "../BoardContext";
 
 export const GameContext = createContext<[]>([]);
@@ -108,7 +109,7 @@ export const GameProvider = ({ children }) => {
 
 const useJoinMeEffect = () => {
   const [{ boardId, items, group }, boardActions] = useContext(BoardContext);
-  const me = useMe();
+  const me = useSelector(selectMe, shallowEqual);
   const myItem = useMyItem();
   const moderatorItem = useModeratorItem();
   const groupId = group.id;
@@ -133,7 +134,7 @@ const useJoinMeEffect = () => {
 
 export const useMyItem = (): BoardItemWithValues | undefined => {
   const [{ items }] = useContext(BoardContext);
-  const me = useMe();
+  const me = useSelector(selectMe, shallowEqual);
   try {
     const myItem = Object.values(items).find(
       (item) => item.creator.id === me.id

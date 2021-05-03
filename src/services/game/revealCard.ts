@@ -1,4 +1,3 @@
-import { BoardGroup } from "../types";
 import { updateRow } from "../updateRow";
 import { getPrivateVote } from "./privateVote";
 

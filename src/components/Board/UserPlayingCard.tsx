@@ -3,7 +3,7 @@ import { PlayingCard } from "../../library/PlayingCard";
 import { Avatar } from "../../library/Avatar";
 import { CARD_BACKS, Vote } from "../../constants/cards";
 import clsx from "clsx";
-import { useSettings } from "../../contexts/AppContext/useSettings";
+import { useCardsSequence } from "../../hooks/useCardsSequence";
 
 export const UserPlayingCard = ({
   user,
@@ -14,7 +14,6 @@ export const UserPlayingCard = ({
   style,
 }) => {
   const cardBack = useCardBack(user.id, voting_status);
-  console.log(cardBack, voting_status);
   const { variant, label, value } = usePlayingCardProps(vote, voting_status);
   return (
     <div
@@ -55,7 +54,7 @@ export const usePlayingCardProps = (
   label?: string;
   value?: Vote;
 } => {
-  const { cardsMap } = useSettings();
+  const { cardsMap } = useCardsSequence();
   if (vote === null || voting_status === "Moderator") {
     return {
       variant: "back",

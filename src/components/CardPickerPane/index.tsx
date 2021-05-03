@@ -1,15 +1,12 @@
 import classes from "./index.module.css";
 import Label from "monday-ui-react-core/dist/Label";
 import AttentionBox from "monday-ui-react-core/dist/AttentionBox";
-import Button from "monday-ui-react-core/dist/Button";
-import { useSettings } from "../../contexts/AppContext/useSettings";
 import { PlayingCard } from "../../library/PlayingCard";
 import { Typography } from "../../library/Typography";
 import { Grid } from "../../library/Grid";
 import { useContext, useEffect, useState } from "react";
 import { Card } from "../../constants/cards";
 import { pickCard } from "../../services/game/pickCard";
-import { useBoardId } from "../../contexts/AppContext";
 import { useMySpace } from "../../contexts/BoardContext/useMySpace";
 import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
 import { updateRow } from "../../services/updateRow";
@@ -20,11 +17,13 @@ import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 import { GameSessionControls } from "../GameSessionControls";
 import { GameStatus } from "../../services/types";
 import { usePlayers } from "../../hooks/usePlayers";
-import { useViewMode } from "../../contexts/AppContext/useViewMode";
+import { useSelector } from "react-redux";
+import { selectBoardId, selectViewMode } from "../../state/contextSlice";
+import { useCardsSequence } from "../../hooks/useCardsSequence";
 
 export const CardPickerPane = () => {
-  const { cardsSequence } = useSettings();
-  const boardId = useBoardId();
+  const { cardsSequence } = useCardsSequence();
+  const boardId = useSelector(selectBoardId);
   const myItem = useMyItem();
   const [selected, setSelected] = useState<Card["value"]>(null);
   const players = usePlayers();
@@ -54,7 +53,7 @@ export const CardPickerPane = () => {
 
   const iAmModerator = useIAmModerator();
 
-  const viewMode = useViewMode();
+  const viewMode = useSelector(selectViewMode);
   const phase = usePhase(moderatorItem);
 
   useEffect(() => {

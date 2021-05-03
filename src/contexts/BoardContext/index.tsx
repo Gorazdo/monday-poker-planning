@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { useAsyncFn, useMap } from "react-use";
 import { Actions } from "react-use/lib/useMap";
 import { RoundNumber } from "../../constants/cards";
@@ -16,6 +17,7 @@ import {
   StatusMap,
   User,
 } from "../../services/types";
+import { selectBoardId } from "../../state/contextSlice";
 import { normalizeById } from "../../utils/normalizers";
 import { useBoardInitialization } from "./useBoardInitialization";
 
@@ -31,7 +33,8 @@ type BoardState = {
   allUsers: User[];
 };
 
-export const BoardProvider = ({ children, boardType, boardId }) => {
+export const BoardProvider = ({ children, boardType }) => {
+  const boardId = useSelector(selectBoardId);
   const [statuses, { set: setStatus }] = useMap<StatusMap>({
     prepared: "pending",
     items: "pending",
