@@ -10,9 +10,11 @@ export const UserPlayingCard = ({
   joined,
   vote,
   voting_status,
+  phase,
   style,
 }) => {
-  const cardBack = useCardBack(user.id + 3, voting_status);
+  const cardBack = useCardBack(user.id, voting_status);
+  console.log(cardBack, voting_status);
   const { variant, label, value } = usePlayingCardProps(vote, voting_status);
   return (
     <div
@@ -24,7 +26,7 @@ export const UserPlayingCard = ({
       <PlayingCard
         value={value}
         label={label}
-        variant={variant}
+        variant={phase === "Session ended" ? "back" : variant}
         backCover={`/cards/${cardBack}.svg`}
         voting_status={voting_status}
         customAriaLabel={`${user.name} is ${voting_status ?? "off"}`}
@@ -67,13 +69,25 @@ export const usePlayingCardProps = (
 };
 
 const useCardBack = (
-  index: number,
+  userId: number,
   voting_status
 ): typeof CARD_BACKS[number] | "king" => {
   if (voting_status === "Moderator") {
     return "king";
   }
-  return CARD_BACKS[index % CARD_BACKS.length];
+  if (userId === 21757101) {
+    return "pink";
+  }
+  if (userId === 21749286) {
+    return "green";
+  }
+  if (userId === 21837843) {
+    return "purple";
+  }
+  if (userId === 21757101) {
+    return "blue";
+  }
+  return CARD_BACKS[userId % CARD_BACKS.length];
 };
 
 export const UserPlayingCardStub = () => {

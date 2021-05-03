@@ -39,6 +39,14 @@ export const GameProvider = ({ children }) => {
           });
           console.log({ items, thisGroupItems, groupId });
         });
+        // double check to load everything
+        fetchGroupItemsAndValues(boardId, groupId).then((updatedItems) => {
+          // update items in the store
+          boardActions.set("items", {
+            ...items,
+            ...normalizeById(updatedItems),
+          });
+        });
       }
       if (data.type === "change_column_values") {
         if (data.columnId.startsWith("round_")) {
@@ -102,6 +110,7 @@ const useJoinMeEffect = () => {
   const [{ boardId, items, group }, boardActions] = useContext(BoardContext);
   const me = useMe();
   const myItem = useMyItem();
+  const moderatorItem = useModeratorItem();
   const groupId = group.id;
   useDeepCompareEffect(() => {
     console.log(groupId);
@@ -119,7 +128,7 @@ const useJoinMeEffect = () => {
     } else {
       console.log(me, "Has been joined");
     }
-  }, [myItem, me, groupId, boardId]);
+  }, [myItem, moderatorItem?.id, me, groupId, boardId]);
 };
 
 export const useMyItem = (): BoardItemWithValues | undefined => {

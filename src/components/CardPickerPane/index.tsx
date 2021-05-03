@@ -1,5 +1,6 @@
 import classes from "./index.module.css";
 import Label from "monday-ui-react-core/dist/Label";
+import AttentionBox from "monday-ui-react-core/dist/AttentionBox";
 import Button from "monday-ui-react-core/dist/Button";
 import { useSettings } from "../../contexts/AppContext/useSettings";
 import { PlayingCard } from "../../library/PlayingCard";
@@ -55,16 +56,23 @@ export const CardPickerPane = () => {
 
   const viewMode = useViewMode();
   const phase = usePhase(moderatorItem);
+
   useEffect(() => {
     setSelected(null);
   }, [phase]);
+
   if (phase === null) {
-    return null;
+    return (
+      <AttentionBox
+        title="Something went wrong"
+        text="Please, press [Manual Refresh] button"
+      />
+    );
   }
   if (phase.startsWith("Discussion")) {
     return (
       <div>
-        <Typography variant="h3" gutterBottom>
+        <Typography variant="h3" className={classes.typography}>
           Let's discuss the numbers!{" "}
           <span className={classes.label}>
             <Label text="Discussion phase" />
@@ -79,7 +87,7 @@ export const CardPickerPane = () => {
       if (Object.values(players).length === 1) {
         return (
           <div>
-            <Typography variant="h3" gutterBottom>
+            <Typography variant="h3" className={classes.typography}>
               Waiting for others{" "}
               <span className={classes.label}>
                 <Label text="Invite them" />
@@ -93,7 +101,7 @@ export const CardPickerPane = () => {
       }
       return (
         <div>
-          <Typography variant="h3" gutterBottom>
+          <Typography variant="h3" className={classes.typography}>
             Players is making their choice{" "}
             <span className={classes.label}>
               <Label text="Voting phase" />
@@ -106,7 +114,7 @@ export const CardPickerPane = () => {
     return (
       <div>
         {viewMode !== "split" && (
-          <Typography variant="h3" gutterBottom>
+          <Typography variant="h3" className={classes.typography}>
             Choose your card{" "}
             <span className={classes.label}>
               <Label text="Voting phase" />
@@ -131,7 +139,7 @@ export const CardPickerPane = () => {
     if (iAmModerator) {
       return (
         <div>
-          <Typography variant="h3" gutterBottom>
+          <Typography variant="h3" className={classes.typography}>
             Are you ready for a new game?{" "}
             <span className={classes.label}>
               <Label text="New round" />
@@ -143,9 +151,13 @@ export const CardPickerPane = () => {
     }
     return (
       <div>
-        <Button onClick={becomeModeratorFn} loading={loading}>
-          Become a moderator
-        </Button>
+        <Typography variant="h3" className={classes.typography}>
+          You can take control!{" "}
+          <span className={classes.label}>
+            <Label text="New game?" />
+          </span>
+        </Typography>
+        <NewGameCreation />
       </div>
     );
   }

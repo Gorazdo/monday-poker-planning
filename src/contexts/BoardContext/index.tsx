@@ -128,18 +128,3 @@ export const useModeratorItem = (): BoardItemWithValues | null => {
     ) ?? null
   );
 };
-
-export const useRefetchFn = () => {
-  const [{ boardId, group }, boardActions] = useContext(BoardContext);
-  const [status, refetchFn] = useAsyncFn(async () => {
-    if (!group) {
-      return;
-    }
-    await fetchGroupItemsAndValues(boardId, group.id).then((items) => {
-      console.log("Refetched items", items);
-      boardActions.set("items", normalizeById(items));
-    });
-  }, [boardId, group?.id]);
-
-  return refetchFn;
-};

@@ -1,13 +1,16 @@
 import { monday } from "../monday";
 import { updateRow } from "../updateRow";
+import { setPrivateVote } from "./privateVote";
 
 export const pickCard = async (
   roundNumber,
   value,
   { boardId, userId, itemId }
 ) => {
-  const privateResult = await monday.storage.instance.setItem(
-    `${userId}_${roundNumber}`,
+  const privateResult = await setPrivateVote(
+    itemId,
+    userId,
+    roundNumber,
     value
   );
 

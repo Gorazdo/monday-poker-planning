@@ -1,14 +1,15 @@
 import { RoundNumber, Vote } from "../../constants/cards";
 import { monday } from "../monday";
-import { User } from "../types";
+import { BoardItem, User } from "../types";
 
 export const setPrivateVote = async (
+  itemId: BoardItem["id"],
   userId: User["id"],
   roundNumber: RoundNumber,
   vote: Vote
 ) => {
   const response = await monday.storage.instance.setItem(
-    `${userId}_${roundNumber}`,
+    `${itemId}_${userId}_${roundNumber}`,
     vote
   );
   console.log(response);
@@ -16,11 +17,12 @@ export const setPrivateVote = async (
 };
 
 export const getPrivateVote = async (
+  itemId: BoardItem["id"],
   userId: User["id"],
   roundNumber: RoundNumber
 ): Promise<Vote> => {
   const response = await monday.storage.instance.getItem(
-    `${userId}_${roundNumber}`
+    `${itemId}_${userId}_${roundNumber}`
   );
   console.log(response);
   // @ts-ignore // there is wrongly types response

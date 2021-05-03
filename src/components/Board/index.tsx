@@ -6,6 +6,9 @@ import { usePlayers } from "../../hooks/usePlayers";
 import { Toolbar } from "../Toolbar";
 import { useViewMode } from "../../contexts/AppContext/useViewMode";
 import { UserPlayingCard, UserPlayingCardStub } from "./UserPlayingCard";
+import { useModeratorItem } from "../../contexts/BoardContext";
+import { usePhase } from "../../contexts/BoardContext/useRound";
+import { extractVote } from "../../services/game/revealCard";
 
 export const Board = () => {
   const viewMode = useViewMode();
@@ -24,6 +27,9 @@ export const Board = () => {
 const InteractiveBoard = () => {
   const players = usePlayers();
   const users = useUsers();
+
+  const moderatorItem = useModeratorItem();
+  const phase = usePhase(moderatorItem);
   console.log({ players, users });
   const [ref, { width }] = useMeasure();
   return (
@@ -43,8 +49,8 @@ const InteractiveBoard = () => {
         .sort((a, b) => a.sortkey - b.sortkey)
         .map((user, index, users) => {
           const joined = user.id in players;
-          const vote = players[user.id]?.vote ?? null;
-          const minmax = getMinMax(users, players);
+          const vote = extractVote(players[user.id]?.vote);
+          // const minmax = getMinMax(users, players);
           return (
             <UserPlayingCard
               key={user.id}
@@ -53,13 +59,11 @@ const InteractiveBoard = () => {
               style={{
                 width: 120,
                 transform: joined
-                  ? `translateX(${(120 + 20) * index}px ${getTransform(
-                      minmax,
-                      vote
-                    )})`
+                  ? `translateX(${(120 + 20) * index}px)`
                   : `translateX(${width - 120 - index * 10}px)`,
               }}
               joined={joined}
+              phase={phase}
               voting_status={players[user.id]?.voting_status}
             />
           );
