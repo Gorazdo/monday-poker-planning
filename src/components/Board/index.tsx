@@ -16,6 +16,7 @@ import { BoardContext, useModeratorItem } from "../../contexts/BoardContext";
 import { useIAmModerator } from "../../contexts/GameContext";
 import { updateRow } from "../../services/updateRow";
 import { useSettings } from "../../contexts/AppContext/useSettings";
+import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 
 const useCardBack = (index: number): typeof CARD_BACKS[number] => {
   return CARD_BACKS[index % CARD_BACKS.length];
@@ -23,8 +24,12 @@ const useCardBack = (index: number): typeof CARD_BACKS[number] => {
 
 export const Board = () => {
   const boardId = useBoardId();
-  const [{ group, items, round }, boardActions] = useContext(BoardContext);
+  const [{ group, items }] = useContext(BoardContext);
+
   const moderatorItem = useModeratorItem();
+  const phase = usePhase(moderatorItem);
+
+  const round = useRound();
   const [endSessionState, endSessionHandler] = useAsyncFn(async () => {
     await updateRow(boardId, moderatorItem.id, {
       game_status: "Session ended",
@@ -34,6 +39,22 @@ export const Board = () => {
   const [revealed, setRevealed] = useState(false);
 
   const [, revealCardsHandler] = useAsyncFn(async () => {
+    if (round === 1) {
+      await updateRow(boardId, moderatorItem.id, {
+        game_status: "Discussion 1",
+      });
+    }
+    if (round === 2) {
+      await updateRow(boardId, moderatorItem.id, {
+        game_status: "Discussion 2",
+      });
+    }
+    if (round === 3) {
+      await updateRow(boardId, moderatorItem.id, {
+        game_status: "Discussion 3",
+      });
+    }
+
     await Promise.all(
       Object.values(items).map((item) =>
         revealCard(round, {
@@ -44,12 +65,30 @@ export const Board = () => {
       )
     );
     setRevealed(true);
-  }, [boardId, moderatorItem?.id]);
+  }, [items, boardId, moderatorItem?.id]);
 
-  const handleNewRound = () => {
-    setRevealed(false);
-    boardActions.set("round", 2);
-  };
+  const [, newRoundHandler] = useAsyncFn(async () => {
+    await Promise.all(
+      Object.values(items)
+        .filter((item) => item.id !== moderatorItem.id)
+        .map((item) =>
+          updateRow(boardId, item.id, {
+            voting_status: "Voting",
+          })
+        )
+    );
+
+    if (round === 1) {
+      await updateRow(boardId, moderatorItem.id, {
+        game_status: "Round 2",
+      });
+    }
+    if (round === 2) {
+      await updateRow(boardId, moderatorItem.id, {
+        game_status: "Round 3",
+      });
+    }
+  }, [items, boardId, moderatorItem?.id]);
 
   const iAmModerator = useIAmModerator();
 
@@ -61,10 +100,10 @@ export const Board = () => {
             {!group ? "Loading..." : group.title}
           </Typography>
           <Typography variant="p" gutterBottom>
-            Round #{round}
+            {moderatorItem?.values?.game_status?.text}
           </Typography>
         </div>
-        {iAmModerator && (
+        {iAmModerator && phase !== "Session ended" && (
           <Grid variant="row">
             <Button
               kind="secondary"
@@ -73,9 +112,10 @@ export const Board = () => {
             >
               End Session
             </Button>
-            {revealed ? (
-              <Button onClick={handleNewRound}>New round</Button>
-            ) : (
+            {phase.startsWith("Discussion") && round !== 3 && (
+              <Button onClick={newRoundHandler}>New round</Button>
+            )}
+            {phase.startsWith("Round") && round !== 3 && (
               <Button onClick={revealCardsHandler}>Reveal Cards</Button>
             )}
           </Grid>
@@ -108,11 +148,13 @@ const InteractiveBoard = () => {
         .sort((a, b) => a.sortkey - b.sortkey)
         .map((user, index) => {
           const joined = user.id in players;
+          const vote = players[user.id]?.vote ?? null;
+          console.log(vote);
           return (
             <UserPlayingCard
               key={user.id}
               user={user}
-              vote={players[user.id]?.vote ?? null}
+              vote={vote}
               style={{
                 width: 120,
                 transform: joined

@@ -39,7 +39,7 @@ export const PlayingCard: React.FC<PlayingCardProps> = ({
   selected,
   onChange,
 }) => {
-  const [rotate] = useState(variant === "face" ? 180 : 0);
+  const rotate = variant === "face" ? 180 : 0;
   const handleClick = (event) => {
     if (typeof onChange === "function") {
       onChange(value, variant);
@@ -58,6 +58,7 @@ export const PlayingCard: React.FC<PlayingCardProps> = ({
           [classes.rootFaceDown]: variant === "back",
           [classes.rootSelected]: selected,
           [classes.rootPale]: voting_status === "Joined",
+          [classes.rootPale]: voting_status === "Voting",
           [classes.rootVoted]: voting_status === "Voted",
           [classes.rootModerator]: voting_status === "Moderator",
         })}

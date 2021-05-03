@@ -1,0 +1,5 @@
+.root {
+  background-color: var(--color-ui_grey);
+  padding: var(--spacing-large);
+  position: relative;
+}

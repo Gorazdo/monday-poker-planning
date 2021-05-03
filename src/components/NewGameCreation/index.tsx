@@ -22,7 +22,7 @@ export const NewGameCreation = () => {
     const group = await createGroup(boardId, state);
     console.log(group);
     const row = await updateRow(boardId, myItem.id, {
-      game_status: "Session ended",
+      game_status: "New Game",
     });
     setBoardContext("group", group);
 

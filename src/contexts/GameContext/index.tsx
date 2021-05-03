@@ -5,7 +5,7 @@ import { fetchBoardGroups } from "../../services/fetchBoardGroups";
 import { fetchBoardItemsWithValues } from "../../services/fetchBoardItems";
 import { fetchGroupItemsAndValues } from "../../services/fetchBoardItemsAndValues";
 import { joinGame } from "../../services/game/joinGame";
-import { BoardItem } from "../../services/types";
+import { BoardItem, BoardItemWithValues } from "../../services/types";
 import { normalizeById } from "../../utils/normalizers";
 import { useMe } from "../AppContext";
 import { BoardContext, useModeratorItem } from "../BoardContext";
@@ -43,14 +43,37 @@ export const GameProvider = ({ children }) => {
         });
       }
       if (data.type === "change_column_values") {
+        if (data.columnId.startsWith("round_")) {
+          fetchGroupItemsAndValues(boardId, groupId).then((updatedItems) => {
+            // update items in the store
+            boardActions.set("items", {
+              ...items,
+              ...normalizeById(updatedItems),
+            });
+          });
+        }
+
         if (data.columnId === "game_status") {
-          if (data.columnValue === "Session ended") {
+          if (data.columnValue === "New Game") {
+            // look for a new gorup and "join" in a second
             fetchBoardGroups(boardId).then((groups) => {
               const [latestGroup] = groups;
               console.log({ latestGroup });
               setTimeout(() => {
                 boardActions.set("group", latestGroup);
               }, 1000);
+            });
+          }
+          if (
+            data.columnValue.startsWith("Round") ||
+            data.columnValue === "Session ended"
+          ) {
+            fetchGroupItemsAndValues(boardId, groupId).then((updatedItems) => {
+              // update items in the store
+              boardActions.set("items", {
+                ...items,
+                ...normalizeById(updatedItems),
+              });
             });
           }
         }
@@ -100,11 +123,17 @@ const useJoinMeEffect = () => {
   }, [myItem, me, groupId, boardId]);
 };
 
-export const useMyItem = (): BoardItem | undefined => {
+export const useMyItem = (): BoardItemWithValues | undefined => {
   const [{ items }] = useContext(BoardContext);
   const me = useMe();
-  const myItem = Object.values(items).find((item) => item.creator.id === me.id);
-  return myItem;
+  try {
+    const myItem = Object.values(items).find(
+      (item) => item.creator.id === me.id
+    );
+    return myItem;
+  } catch {
+    return undefined;
+  }
 };
 
 export const useIAmModerator = () => {

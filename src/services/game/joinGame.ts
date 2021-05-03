@@ -25,7 +25,6 @@ export const joinGame = async ({
     // it's been created already
     return { item: currentUserItem };
   }
-  console.log({ currentItems });
   const isModerator = currentItems.length === 0;
   const newItem = await createItem(`${user.name}'s vote panel`, {
     voting_status: isModerator ? "Moderator" : "Joined",
@@ -34,6 +33,6 @@ export const joinGame = async ({
   });
 
   const fullNewItem = await fetchItem(boardId, newItem.id);
-
+  console.log({ fullNewItem });
   return { item: fullNewItem, isModerator };
 };

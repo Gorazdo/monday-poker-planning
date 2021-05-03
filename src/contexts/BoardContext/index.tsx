@@ -120,7 +120,6 @@ export const BoardProvider = ({ children, boardType, boardId }) => {
 
 export const useModeratorItem = (): BoardItemWithValues | null => {
   const [{ items }] = useContext(BoardContext);
-  console.log(items);
   return (
     Object.values(items).find(
       (item) => item.values.voting_status.text === "Moderator"

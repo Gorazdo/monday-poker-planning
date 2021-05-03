@@ -96,7 +96,15 @@ export type User = {
   photo_thumb: string;
 };
 
-export type GameStatus = "Round 1" | "Round 2" | "Round 3" | "Session ended";
+export type GameStatus =
+  | "Discussion 1"
+  | "Discussion 2"
+  | "Discussion 3"
+  | "Round 1"
+  | "Round 2"
+  | "Round 3"
+  | "Session ended"
+  | "New Game";
 
 export type RowValues = {
   voting_status: VotingStatusType;

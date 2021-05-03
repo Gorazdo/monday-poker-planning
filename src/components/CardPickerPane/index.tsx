@@ -5,7 +5,7 @@ import { useSettings } from "../../contexts/AppContext/useSettings";
 import { PlayingCard } from "../../library/PlayingCard";
 import { Typography } from "../../library/Typography";
 import { Grid } from "../../library/Grid";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Card } from "../../constants/cards";
 import { pickCard } from "../../services/game/pickCard";
 import { useBoardId } from "../../contexts/AppContext";
@@ -15,16 +15,17 @@ import { updateRow } from "../../services/updateRow";
 import { useIAmModerator, useMyItem } from "../../contexts/GameContext";
 import { useAsyncFn } from "react-use";
 import { NewGameCreation } from "../NewGameCreation";
-import { GameStatus } from "../../services/types";
+import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 
 export const CardPickerPane = () => {
   const { cardsSequence } = useSettings();
   const boardId = useBoardId();
   const myItem = useMyItem();
   const [selected, setSelected] = useState<Card["value"]>(null);
+
   const [, boardActions] = useContext(BoardContext);
   const moderatorItem = useModeratorItem();
-  console.log({ moderatorItem, myItem });
+  console.log("CardPickerPane", { moderatorItem, myItem });
 
   const [{ loading }, becomeModeratorFn] = useAsyncFn(async () => {
     if (moderatorItem !== null) {
@@ -41,14 +42,28 @@ export const CardPickerPane = () => {
   const iAmModerator = useIAmModerator();
 
   const phase = usePhase(moderatorItem);
-
+  useEffect(() => {
+    setSelected(null);
+  }, [phase]);
   if (phase === null) {
     return null;
+  }
+  if (phase.startsWith("Discussion")) {
+    return (
+      <div>
+        <Typography variant="h3" gutterBottom>
+          Let's discuss the numbers!{" "}
+          <span className={classes.label}>
+            <Label text="Discussion phase" />
+          </span>
+        </Typography>
+      </div>
+    );
   }
   if (phase.startsWith("Round")) {
     if (iAmModerator) {
       return (
-        <div className={classes.root}>
+        <div>
           <Typography variant="h3" gutterBottom>
             Players is making their choice{" "}
             <span className={classes.label}>
@@ -59,7 +74,7 @@ export const CardPickerPane = () => {
       );
     }
     return (
-      <div className={classes.root}>
+      <div>
         <Typography variant="h3" gutterBottom>
           Choose your card{" "}
           <span className={classes.label}>
@@ -83,32 +98,25 @@ export const CardPickerPane = () => {
   if (phase === "Session ended") {
     if (iAmModerator) {
       return (
-        <div className={classes.root}>
+        <div>
           <NewGameCreation />
         </div>
       );
     }
     return (
-      <div className={classes.root}>
+      <div>
         <Button onClick={becomeModeratorFn} loading={loading}>
           Become a moderator
         </Button>
       </div>
     );
   }
-  return <div className={classes.root}>Unknown phase: {phase}</div>;
-};
-
-const usePhase = (moderatorItem): null | GameStatus => {
-  try {
-    return moderatorItem.values.game_status.value;
-  } catch {
-    return null;
-  }
+  return <div>Unknown phase: {phase}</div>;
 };
 
 const PickCard = ({ item, selected, setSelected }) => {
   const { boardId, userId, itemId } = useMySpace();
+  const round = useRound();
   return (
     <div key={item.value} style={{ minWidth: 80 }}>
       <PlayingCard
@@ -117,7 +125,7 @@ const PickCard = ({ item, selected, setSelected }) => {
         variant="face"
         onChange={(value) => {
           setSelected(value);
-          pickCard(1, value, {
+          pickCard(round, value, {
             boardId,
             userId,
             itemId,
