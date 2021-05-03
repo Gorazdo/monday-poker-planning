@@ -6,7 +6,6 @@ import { useAsyncFn } from "react-use";
 import { Grid } from "../../library/Grid";
 import classes from "./index.module.css";
 import { updateRow } from "../../services/updateRow";
-import { useSetBoardContext } from "../../contexts/BoardContext/useSetBoardContext";
 import { useSelector } from "react-redux";
 import { selectBoardId } from "../../state/contextSlice";
 import { useAppDispatch } from "../../state/store";
@@ -14,7 +13,6 @@ import { boardSlice, selectMyItemId } from "../../state/boardSlice";
 
 export const NewGameCreation = () => {
   const [state, setState] = useState("");
-  const setBoardContext = useSetBoardContext();
   const boardId = useSelector(selectBoardId);
   const myItemId = useSelector(selectMyItemId);
   const dispatch = useAppDispatch();
@@ -28,11 +26,10 @@ export const NewGameCreation = () => {
     const row = await updateRow(boardId, myItemId, {
       game_status: "New Game",
     });
-    setBoardContext("group", group);
     dispatch(boardSlice.actions.setGroup(group));
 
     console.log(row);
-  }, [boardId, myItemId, state, setBoardContext]);
+  }, [boardId, myItemId, state]);
   return (
     <Grid>
       <div className={classes.inputWrapper}>

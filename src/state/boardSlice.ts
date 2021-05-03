@@ -102,7 +102,9 @@ export const selectBoardStatus = createSelector(
   sliceSelector,
   (board) => board.status
 );
-
+export const selectGroup = createSelector(sliceSelector, (board) => {
+  return board.group;
+});
 export const selectGroupId = createSelector(sliceSelector, (board) => {
   return board.group?.id;
 });

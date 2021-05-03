@@ -6,6 +6,7 @@ import { useReoccuringDispatch } from "../../hooks/useReoccuringFetch";
 import { fetchBoardGroups } from "../../services/fetchBoardGroups";
 import { joinGame } from "../../services/game/joinGame";
 import {
+  boardSlice,
   fetchCurrentItemsThunk,
   selectGroupId,
   selectModeratorItemId,
@@ -14,15 +15,13 @@ import {
 import { selectBoardId } from "../../state/contextSlice";
 import { selectMe } from "../../state/meSlice";
 import { useAppDispatch } from "../../state/store";
-import { BoardContext } from "../BoardContext";
 
 export const GameContext = createContext<[]>([]);
 
 export const GameProvider = ({ children }) => {
   const boardId = useSelector(selectBoardId);
-  const [{ group }, boardActions] = useContext(BoardContext);
+  const groupId = useSelector(selectGroupId);
 
-  const groupId = group.id;
   useJoinMeEffect();
   useReoccuringDispatch(fetchCurrentItemsThunk({ boardId, groupId }));
   const dispatch = useAppDispatch();
@@ -51,7 +50,7 @@ export const GameProvider = ({ children }) => {
               const [latestGroup] = groups;
               console.log({ latestGroup });
               setTimeout(() => {
-                boardActions.set("group", latestGroup);
+                dispatch(boardSlice.actions.setGroup(latestGroup));
               }, 1000);
             });
           }
