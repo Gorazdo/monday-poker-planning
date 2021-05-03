@@ -30,7 +30,6 @@ type BoardState = {
   items: Record<string, BoardItemWithValues>;
   round: RoundNumber;
   sessionStarted: boolean;
-  allUsers: User[];
 };
 
 export const BoardProvider = ({ children, boardType }) => {
@@ -38,7 +37,6 @@ export const BoardProvider = ({ children, boardType }) => {
   const [statuses, { set: setStatus }] = useMap<StatusMap>({
     prepared: "pending",
     items: "pending",
-    allUsers: "pending",
     group: "pending",
   });
   const [boardState, boardActions] = useMap<BoardState>({
@@ -46,24 +44,12 @@ export const BoardProvider = ({ children, boardType }) => {
     items: {},
     round: 1,
     sessionStarted: false,
-    allUsers: [],
   });
   const { set } = boardActions;
 
   useConsole("BoardContext", statuses, boardState);
 
   useBoardInitialization({ boardType, boardId, setStatus });
-
-  useEffect(() => {
-    fetchUsers()
-      .then((users) => {
-        set("allUsers", users);
-        setStatus("allUsers", "fulfilled");
-      })
-      .catch((error) => {
-        setStatus("allUsers", error);
-      });
-  }, [setStatus, set]);
 
   useEffect(() => {
     if (statuses.prepared === "fulfilled") {

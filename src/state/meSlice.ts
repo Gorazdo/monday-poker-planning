@@ -29,7 +29,7 @@ export const meSlice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(fetchMeThunk.pending, (state) => {
-        state.status = "pending";
+        // we do nothing here
       })
       .addCase(fetchMeThunk.fulfilled, (state, action) => {
         state.status = "fulfilled";

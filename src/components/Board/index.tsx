@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import { useMeasure } from "react-use";
 import classes from "./index.module.css";
-import { useUsers } from "../../contexts/BoardContext/useUsers";
 import { usePlayers } from "../../hooks/usePlayers";
 import { Toolbar } from "../Toolbar";
 import { UserPlayingCard, UserPlayingCardStub } from "./UserPlayingCard";
@@ -10,6 +9,7 @@ import { usePhase } from "../../contexts/BoardContext/useRound";
 import { extractVote } from "../../services/game/revealCard";
 import { useSelector } from "react-redux";
 import { selectViewMode } from "../../state/contextSlice";
+import { selectUsers } from "../../state/usersSlice";
 
 export const Board = () => {
   const viewMode = useSelector(selectViewMode);
@@ -27,7 +27,7 @@ export const Board = () => {
 
 const InteractiveBoard = () => {
   const players = usePlayers();
-  const users = useUsers();
+  const users = useSelector(selectUsers);
 
   const moderatorItem = useModeratorItem();
   const phase = usePhase(moderatorItem);

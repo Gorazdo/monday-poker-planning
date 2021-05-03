@@ -8,12 +8,14 @@ import { contextSlice } from "./state/contextSlice";
 import { fetchMeThunk } from "./state/meSlice";
 import { selectAppReady, selectAppStatus } from "./state/selectors";
 import { settingsSlice } from "./state/settingsSlice";
-import { useDispatch } from "./state/store";
+import { useAppDispatch } from "./state/store";
+import { fetchUsersThunk } from "./state/usersSlice";
 
 function App() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(fetchMeThunk());
+    dispatch(fetchUsersThunk());
   }, []);
 
   const contextCallback = useCallback((response) => {

@@ -2,7 +2,12 @@ import { createSelector } from "reselect";
 import { RootState } from "../store";
 
 export const selectAppStatus = (state: RootState) => {
-  return [state.context.status, state.me.status, state.settings.status];
+  return [
+    state.context.status,
+    state.me.status,
+    state.settings.status,
+    state.users.status,
+  ];
 };
 
 export const selectAppReady = createSelector(selectAppStatus, (statuses) =>

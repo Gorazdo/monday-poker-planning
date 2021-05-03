@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { useDispatch as useReduxDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import rootReducer from "./rootReducer";
 
 const preloadedState = {};
@@ -24,4 +24,4 @@ if (module.hot) {
 
 export type AppDispatch = typeof store.dispatch;
 
-export const useDispatch = () => useReduxDispatch<AppDispatch>();
+export const useAppDispatch = () => useDispatch<AppDispatch>();
