@@ -11,6 +11,10 @@ export const fetchItem = async (
     {
       boards(ids: ${boardId}) {
         items(ids: ${itemId}) {
+          creator {
+            id
+            name
+          }
           column_values {
             id
             value

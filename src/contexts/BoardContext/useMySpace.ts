@@ -6,6 +6,7 @@ export const useMySpace = () => {
   const [{ group, items }] = useContext(BoardContext);
   const boardId = useBoardId();
   const me = useMe();
+  console.log(group, items, me);
   return {
     boardId,
     userId: me.id,
