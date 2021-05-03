@@ -11,6 +11,7 @@ import { useBoardId } from "../../contexts/AppContext";
 import { detectBoardType } from "../../utils/detectBoardType";
 import { Grid } from "../../library/Grid";
 import { PlayingBoard } from "../PlayingBoard";
+import { FullScreenLoader } from "../../library/FullScreenLoader";
 
 export const Intro = () => {
   const boardId = useBoardId();
@@ -19,13 +20,7 @@ export const Intro = () => {
   }, [boardId]);
 
   if (loading && !value) {
-    return (
-      <div className={classes.popupWrapper}>
-        <div className={classes.loaderWrapper}>
-          <Loader />
-        </div>
-      </div>
-    );
+    return <FullScreenLoader label="Distributing the cards..." percent={100} />;
   }
   if (value) {
     const boardType = detectBoardType(value);
@@ -52,8 +47,9 @@ const StrategySwitcher = ({ boardSummaryData, boardType }) => {
   return (
     <div className={classes.popupWrapper}>
       <PopupContent>
-        <Typography variant="h1" gutterBottom>
-          This <Board name={name} /> seems&nbsp;to&nbsp;be in&nbsp;use
+        <img src="/assets/upset.svg" className={classes.illustration} />
+        <Typography variant="h1" gutterBottom className={classes.title}>
+          This <Board name={name} /> seems <br /> to&nbsp;be in&nbsp;use
         </Typography>
         <Typography variant="h3">How to use our app safely?</Typography>
         <ol>

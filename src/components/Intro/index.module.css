@@ -7,12 +7,6 @@
   perspective: 500px;
 }
 
-.loaderWrapper {
-  position: relative;
-  width: 80px;
-  height: 80px;
-}
-
 .buttons {
   margin-top: 24px;
   display: grid;
@@ -24,4 +18,12 @@
   /* Investigate why rightIcon="fa-check" doesn't work */
   margin-left: 8px;
   margin-right: -4px;
+}
+
+.illustration {
+  margin-bottom: var(--spacing-large);
+}
+
+.title {
+  text-align: center;
 }

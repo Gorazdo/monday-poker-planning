@@ -1,9 +1,9 @@
-import LinearProgressBar from "monday-ui-react-core/dist/LinearProgressBar";
 import { createContext, useCallback, useContext, useEffect } from "react";
 import { useMap } from "react-use";
 import { useConsole } from "../../hooks/useContextConsole";
 import { useLoadingPercent } from "../../hooks/useLoadingStatus";
 import { useMondayListenerEffect } from "../../hooks/useMondayListenerEffect";
+import { FullScreenLoader } from "../../library/FullScreenLoader";
 import { fetchBoardOwnerAccount } from "../../services/fetchBoardOwnerAccount";
 import { fetchMe } from "../../services/fetchMe";
 import { AccountInfo, StatusMap, User } from "../../services/types";
@@ -89,11 +89,9 @@ export const AppProvider = ({ children }) => {
     return <AppContext.Provider value={map}>{children}</AppContext.Provider>;
   }
   return (
-    <LinearProgressBar
-      min={0}
-      max={100}
-      value={loadingPercent}
-      ariaLabel="Application is loading"
+    <FullScreenLoader
+      label="Our dealer is almost here..."
+      percent={loadingPercent}
     />
   );
 };

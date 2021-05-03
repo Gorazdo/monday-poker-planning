@@ -107,6 +107,7 @@ export const CreateNewBoardButton = () => {
   return (
     <Button
       loading={loading}
+      size="large"
       onClick={() => {
         if (loading) {
           return;

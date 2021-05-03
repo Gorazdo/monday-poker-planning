@@ -1,10 +1,10 @@
-import LinearProgressBar from "monday-ui-react-core/dist/LinearProgressBar";
 import { createContext, useContext, useEffect } from "react";
 import { useMap } from "react-use";
 import { Actions } from "react-use/lib/useMap";
 import { RoundNumber } from "../../constants/cards";
 import { useConsole } from "../../hooks/useContextConsole";
 import { useLoadingPercent } from "../../hooks/useLoadingStatus";
+import { FullScreenLoader } from "../../library/FullScreenLoader";
 import { createGroup } from "../../services/createGroup";
 import { fetchBoardGroups } from "../../services/fetchBoardGroups";
 import { fetchGroupItemsAndValues } from "../../services/fetchBoardItemsAndValues";
@@ -109,12 +109,7 @@ export const BoardProvider = ({ children, boardType, boardId }) => {
     );
   }
   return (
-    <LinearProgressBar
-      min={0}
-      max={100}
-      value={loadingPercent}
-      ariaLabel="Board is loading"
-    />
+    <FullScreenLoader label="Shuffling the deck..." percent={loadingPercent} />
   );
 };
 

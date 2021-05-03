@@ -18,7 +18,13 @@ import { updateRow } from "../../services/updateRow";
 import { useSettings } from "../../contexts/AppContext/useSettings";
 import { usePhase, useRound } from "../../contexts/BoardContext/useRound";
 
-const useCardBack = (index: number): typeof CARD_BACKS[number] => {
+const useCardBack = (
+  index: number,
+  voting_status
+): typeof CARD_BACKS[number] | "king" => {
+  if (voting_status === "Moderator") {
+    return "king";
+  }
   return CARD_BACKS[index % CARD_BACKS.length];
 };
 
@@ -171,7 +177,7 @@ const InteractiveBoard = () => {
 };
 
 const UserPlayingCard = ({ user, joined, vote, voting_status, style }) => {
-  const cardBack = useCardBack(user.id + 3);
+  const cardBack = useCardBack(user.id + 3, voting_status);
   const { variant, label, value } = usePlayingCardProps(vote, voting_status);
   return (
     <div
